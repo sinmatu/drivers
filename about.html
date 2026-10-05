@@ -6,107 +6,93 @@
   <meta name="theme-color" content="#b91c1c">
   <title>Sin Matu Enterprise Sdn. Bhd.</title>
   <style>
-    :root{--red:#b91c1c;--dark:#111827;--muted:#667085;--line:#e5e7eb;--soft:#f8fafc}
+    :root{--red:#b91c1c;--red2:#dc2626;--dark:#111827;--muted:#667085;--line:#e5e7eb;--soft:#f8fafc;--white:#fff}
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--dark);background:#fff;line-height:1.65}
-    a{color:inherit}.wrap{width:min(1160px,calc(100% - 40px));margin:auto}
-    .topbar{position:absolute;inset:0 0 auto;z-index:5;height:72px;display:flex;align-items:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.14)}
-    .nav{display:flex;justify-content:space-between;align-items:center;gap:20px}
-    .brand{text-decoration:none;font-weight:850;letter-spacing:-.02em}
-    .brand small{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.13em;font-weight:650;opacity:.72}
-    .back{padding:8px 15px;border:1px solid rgba(255,255,255,.48);border-radius:999px;text-decoration:none;font-size:.9rem;font-weight:750}
-    .hero{min-height:590px;display:flex;align-items:flex-end;color:#fff;position:relative;overflow:hidden;background:linear-gradient(115deg,rgba(17,24,39,.96),rgba(17,24,39,.78)),linear-gradient(135deg,#991b1b,#111827)}
-    .hero:before{content:"";position:absolute;right:-120px;top:-170px;width:590px;height:590px;border:1px solid rgba(255,255,255,.12);border-radius:50%}
-    .hero:after{content:"SME";position:absolute;right:3%;bottom:-88px;font-size:18rem;font-weight:900;letter-spacing:-.1em;line-height:1;color:rgba(255,255,255,.035)}
-    .hero-inner{position:relative;z-index:1;padding:155px 0 88px;max-width:850px}
-    .eyebrow{display:flex;align-items:center;gap:11px;color:#fecaca;font-size:.76rem;text-transform:uppercase;letter-spacing:.18em;font-weight:850}
-    .eyebrow:before{content:"";width:36px;height:2px;background:#ef4444}
-    h1{margin:23px 0 26px;font-size:clamp(3rem,7vw,6rem);line-height:.94;letter-spacing:-.055em}
-    .lead{margin:0;max-width:720px;color:#d1d5db;font-size:clamp(1.05rem,2vw,1.3rem)}
-    .section{padding:88px 0}
-    .intro{display:grid;grid-template-columns:.8fr 1.4fr;gap:82px;align-items:start}
-    .kicker{color:var(--red);font-size:.77rem;font-weight:850;text-transform:uppercase;letter-spacing:.16em;margin-bottom:12px}
-    h2{margin:0;font-size:clamp(2rem,4vw,3.3rem);line-height:1.05;letter-spacing:-.04em}
-    .copy{font-size:1.07rem;color:#475467}.copy p:first-child{margin-top:0}.copy strong{color:var(--dark)}
-    .facts{background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-    .fact-grid{display:grid;grid-template-columns:repeat(3,1fr)}
-    .fact{padding:46px 38px;border-right:1px solid var(--line)}.fact:first-child{padding-left:0}.fact:last-child{border-right:0}
-    .fact b{display:block;font-size:2.15rem;color:var(--red);line-height:1;margin-bottom:12px;letter-spacing:-.035em}
-    .fact span{display:block;color:var(--muted);font-size:.93rem}
-    .operations{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
-    .card{background:var(--dark);color:#fff;border-radius:26px;padding:42px;box-shadow:0 22px 55px rgba(17,24,39,.14)}
-    .card h3{margin:0 0 20px;font-size:1.6rem}.item{padding:15px 0;border-top:1px solid rgba(255,255,255,.1);color:#d1d5db}.item strong{color:#fca5a5;margin-right:10px}
-    .band{background:var(--red);color:#fff;padding:60px 0}.band h2{max-width:850px}.band p{margin:14px 0 0;color:#fee2e2;max-width:720px}
-    footer{background:#0b0f19;color:#98a2b3;padding:28px 0;font-size:.86rem}
-    .foot{display:flex;justify-content:space-between;align-items:center;gap:20px}.foot a{color:#fff;text-decoration:none}
-    @media(max-width:760px){
-      .wrap{width:min(100% - 28px,1160px)}.topbar{height:64px}.brand small{display:none}.hero{min-height:510px}.hero-inner{padding:130px 0 65px}.hero:after{font-size:10rem;right:-10px;bottom:-35px}
-      .section{padding:62px 0}.intro,.operations{grid-template-columns:1fr;gap:34px}.fact-grid{grid-template-columns:1fr}.fact,.fact:first-child{padding:28px 0;border-right:0;border-bottom:1px solid var(--line)}.fact:last-child{border-bottom:0}.card{padding:28px 24px;border-radius:20px}.foot{align-items:flex-start;flex-direction:column}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--dark);background:#fff;line-height:1.6}
+    a{color:inherit}
+    .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+
+    .topbar{position:absolute;inset:0 0 auto;z-index:5;height:70px;display:flex;align-items:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.12)}
+    .nav{display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:850;letter-spacing:-.02em}
+
+    .hero{min-height:460px;display:flex;align-items:flex-end;color:#fff;position:relative;overflow:hidden;
+      background:linear-gradient(115deg,rgba(17,24,39,.97),rgba(17,24,39,.78)),linear-gradient(135deg,#991b1b,#111827)}
+    .hero:before{content:"";position:absolute;right:-130px;top:-180px;width:560px;height:560px;border:1px solid rgba(255,255,255,.12);border-radius:50%}
+    .hero:after{content:"SM";position:absolute;right:4%;bottom:-58px;font-size:16rem;font-weight:900;line-height:1;letter-spacing:-.1em;color:rgba(255,255,255,.035)}
+    .hero-inner{position:relative;z-index:1;padding:135px 0 68px;max-width:780px}
+    .eyebrow{display:flex;align-items:center;gap:10px;color:#fecaca;font-size:.76rem;text-transform:uppercase;letter-spacing:.18em;font-weight:850}
+    .eyebrow:before{content:"";width:34px;height:2px;background:#ef4444}
+    h1{font-size:clamp(2.8rem,6.8vw,5.5rem);line-height:.95;letter-spacing:-.055em;margin:20px 0 22px}
+    .lead{font-size:clamp(1rem,2vw,1.22rem);color:#d1d5db;max-width:700px;margin:0}
+
+    .apps{padding:72px 0 86px;background:var(--soft)}
+    .section-head{margin-bottom:28px}
+    .kicker{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--red);font-weight:850;margin-bottom:8px}
+    h2{font-size:clamp(2rem,4vw,3rem);line-height:1.05;letter-spacing:-.04em;margin:0}
+    .section-head p{color:var(--muted);margin:12px 0 0;max-width:680px}
+
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+    .card{display:flex;flex-direction:column;min-height:245px;padding:30px;border:1px solid var(--line);border-radius:22px;background:#fff;text-decoration:none;box-shadow:0 14px 38px rgba(17,24,39,.06);transition:.2s ease}
+    .card:hover{transform:translateY(-3px);box-shadow:0 20px 48px rgba(17,24,39,.1);border-color:#d1d5db}
+    .icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#fee2e2;color:var(--red);font-weight:900;margin-bottom:24px}
+    .card h3{margin:0 0 10px;font-size:1.45rem;letter-spacing:-.02em}
+    .card p{margin:0;color:var(--muted)}
+    .open{margin-top:auto;padding-top:28px;font-weight:800;color:var(--red)}
+    .card.primary{background:var(--dark);border-color:var(--dark);color:#fff}
+    .card.primary p{color:#cbd5e1}.card.primary .icon{background:rgba(220,38,38,.16);color:#fca5a5}.card.primary .open{color:#fca5a5}
+
+    footer{background:#0b0f19;color:#98a2b3;padding:26px 0;font-size:.86rem}
+    .foot{display:flex;justify-content:space-between;gap:20px;align-items:center}
+    .foot span:last-child{color:#d1d5db}
+
+    @media(max-width:720px){
+      .wrap{width:min(100% - 28px,1120px)}
+      .topbar{height:62px}.hero{min-height:420px}.hero-inner{padding:120px 0 58px}.hero:after{font-size:10rem;right:-10px;bottom:-25px}
+      .apps{padding:56px 0 64px}.grid{grid-template-columns:1fr}.card{min-height:220px;padding:25px}
+      .foot{flex-direction:column;align-items:flex-start}
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap nav">
-      <a class="brand" href="./about.html">Sin Matu Enterprise<small>Sin Matu Enterprise Sdn. Bhd.</small></a>
-      <a class="back" href="./index.html">Back</a>
+      <div class="brand">Sin Matu Enterprise Sdn. Bhd.</div>
     </div>
   </header>
 
   <main>
     <section class="hero">
       <div class="wrap hero-inner">
-        <div class="eyebrow">Company Profile</div>
+        <div class="eyebrow">Internal Home</div>
         <h1>Sin Matu Enterprise Sdn. Bhd.</h1>
-        <p class="lead">Supporting construction-material distribution, import and export, logistics, and operational activities in Labuan.</p>
+        <p class="lead">Construction materials, logistics and operational support in Labuan. Welcome to the internal starting point for company information and staff systems.</p>
       </div>
     </section>
 
-    <section class="section">
-      <div class="wrap intro">
-        <div>
-          <div class="kicker">About Us</div>
-          <h2>Built to support the movement of materials and operations.</h2>
-        </div>
-        <div class="copy">
-          <p><strong>Sin Matu Enterprise Sdn. Bhd. was established in 1997.</strong> The company engages in the wholesale distribution of construction materials as well as import and export operations.</p>
-          <p>As part of its continuing operational development, the company commenced operations at its main hub on reclaimed land off Jalan Patau-Patau, Labuan, in 2005.</p>
-          <p>With its own transportation and construction equipment, Sin Matu Enterprise is able to support material handling, logistics and site operations efficiently.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="facts">
-      <div class="wrap fact-grid">
-        <div class="fact"><b>1997</b><span>Sin Matu Enterprise Sdn. Bhd. established</span></div>
-        <div class="fact"><b>2005</b><span>Main operational hub commenced operations</span></div>
-        <div class="fact"><b>Labuan</b><span>Operations based off Jalan Patau-Patau</span></div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="wrap operations">
-        <div>
-          <div class="kicker">Operations</div>
-          <h2>In-house resources for day-to-day work.</h2>
-          <div class="copy">
-            <p>The company maintains transportation and construction equipment to support its operations, helping move construction materials and carry out related site work when required.</p>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Operational Equipment</h3>
-          <div class="item"><strong>01</strong> Lorries</div>
-          <div class="item"><strong>02</strong> Shovels</div>
-          <div class="item"><strong>03</strong> Excavators</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="band">
+    <section class="apps">
       <div class="wrap">
-        <div class="kicker" style="color:#fecaca">Sin Matu Enterprise Sdn. Bhd.</div>
-        <h2>Wholesale distribution, logistics and operational support.</h2>
-        <p>A focused company profile for Sin Matu Enterprise Sdn. Bhd.</p>
+        <div class="section-head">
+          <div class="kicker">Apps & Links</div>
+          <h2>Where would you like to go?</h2>
+          <p>Use the company website for corporate information, or open the Lorry System for daily operational work.</p>
+        </div>
+
+        <div class="grid">
+          <a class="card" href="https://sinmatu.com/companies/sin-matu-enterprise-sdn-bhd/" target="_blank" rel="noopener">
+            <div class="icon">01</div>
+            <h3>Company Website</h3>
+            <p>View Sin Matu Enterprise Sdn. Bhd. company information, business activities and corporate details.</p>
+            <div class="open">Visit website →</div>
+          </a>
+
+          <a class="card primary" href="./index.html">
+            <div class="icon">02</div>
+            <h3>Lorry System</h3>
+            <p>Access work entries, records, reviews, reports and lorry operating information.</p>
+            <div class="open">Open system →</div>
+          </a>
+        </div>
       </div>
     </section>
   </main>
@@ -114,7 +100,7 @@
   <footer>
     <div class="wrap foot">
       <span>© 2026 Sin Matu Enterprise Sdn. Bhd.</span>
-      <a href="https://sinmatu.com/companies/sin-matu-enterprise-sdn-bhd/" target="_blank" rel="noopener">Official company page ↗</a>
+      <span>Internal Home</span>
     </div>
   </footer>
 </body>
