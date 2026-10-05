@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>Lorry System</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div>
+        <h1>Lorry System</h1>
+        <p class="muted">Driver hours · review · reconciliation</p>
+      </div>
+      <div id="userArea"></div>
+    </header>
+
+    <div id="setupBanner" class="banner hidden"></div>
+
+    <main>
+      <section id="loginView" class="panel login-panel">
+        <h2>Sign in</h2>
+        <p class="muted">Use your assigned Lorry System account.</p>
+        <form id="loginForm">
+          <label>Email
+            <input id="loginEmail" type="email" autocomplete="username" required>
+          </label>
+          <label>Password
+            <input id="loginPassword" type="password" autocomplete="current-password" required>
+          </label>
+          <div id="loginError" class="muted hidden" role="alert"></div>
+          <button class="primary" type="submit">Sign in</button>
+        </form>
+        <div class="muted" style="margin:12px 0">or</div>
+        <button id="googleLoginBtn" class="secondary" type="button">Continue with Google</button>
+      </section>
+
+      <section id="shell" class="hidden">
+        <div class="session-bar panel">
+          <label>
+            Active lorry
+            <select id="activeLorry"></select>
+          </label>
+          <div class="session-meta">
+            <span id="roleBadge" class="badge"></span>
+            <button id="signOutBtn" class="link-btn">Sign out</button>
+          </div>
+        </div>
+
+        <nav id="tabs" class="tabs">
+          <button data-view="entry" class="active">Work Entry</button>
+          <button data-view="records">Records</button>
+          <button data-view="reports" data-role="staff,manager">Reports</button>
+          <button data-view="settings" data-role="manager">Settings</button>
+        </nav>
+
+        <section id="view-entry" class="view panel">
+          <div class="section-head">
+            <div>
+              <h2>New Work Entry</h2>
+              <p id="entryDateLabel" class="muted"></p>
+            </div>
+            <span id="dayTypeBadge" class="badge"></span>
+          </div>
+
+          <form id="workForm">
+            <div class="entry-table-head">
+              <span>Date</span>
+              <span>Start</span>
+              <span>End</span>
+              <span>Public Holiday</span>
+              <span></span>
+            </div>
+            <div id="entryRows"></div>
+
+            <div class="actions">
+              <button id="addEntryRow" class="secondary" type="button">+ Add Entry</button>
+              <button class="primary" type="submit">Submit Entries</button>
+            </div>
+            <p class="muted">Shift numbers are assigned automatically for each lorry and work date.</p>
+          </form>
+        </section>
+
+        <section id="view-records" class="view panel hidden">
+          <div class="section-head">
+            <div>
+              <h2>Records</h2>
+              <span id="recordCount" class="muted"></span>
+            </div>
+            <div class="report-switch record-switch">
+              <button id="recordsModeAll" class="active" type="button">All Records</button>
+              <button id="recordsModeReview" type="button">Review Queue</button>
+            </div>
+          </div>
+
+          <div id="recordsAllPane">
+            <div class="filters">
+              <input id="recordMonth" type="month">
+              <select id="recordLorry"></select>
+              <select id="recordSort">
+                <option value="desc">Date ↓ Newest first</option>
+                <option value="asc">Date ↑ Oldest first</option>
+              </select>
+              <button id="recordApply" class="secondary">Apply</button>
+            </div>
+            <div id="recordsTable" class="table-wrap"></div>
+            <div class="pager">
+              <button id="prevPage" class="secondary">Previous</button>
+              <span id="pageLabel" class="muted"></span>
+              <button id="nextPage" class="secondary">Next</button>
+            </div>
+          </div>
+
+          <div id="recordsReviewPane" class="hidden">
+            <div class="section-head">
+              <span class="muted">Pending → Checked → Correction Required</span>
+            </div>
+            <div id="reviewList"></div>
+          </div>
+        </section>
+
+        <section id="view-reports" class="view panel hidden">
+          <div class="section-head">
+            <h2>Reports & Reconciliation</h2>
+            <div class="report-controls">
+              <input id="reportMonth" type="month">
+              <select id="reportLorry"></select>
+            </div>
+          </div>
+          <div id="reportSummary"></div>
+          <div id="reportTable" class="table-wrap"></div>
+          <div class="actions" style="margin-top:12px">
+            <button id="exportExcel" class="secondary" type="button">Export Excel</button>
+            <button id="exportPdf" class="secondary" type="button">Export PDF</button>
+          </div>
+        </section>
+
+        <section id="view-settings" class="view panel hidden">
+          <h2>Global Settings</h2>
+          <p class="muted">Rates and working-hour boundaries are applied automatically to each submitted entry.</p>
+
+          <form id="settingsForm">
+            <div class="grid three">
+              <label>Normal start<input id="normalStart" type="time"></label>
+              <label>Normal end<input id="normalEnd" type="time"></label>
+              <label>Saturday normal end<input id="saturdayEnd" type="time"></label>
+            </div>
+            <div class="grid two">
+              <label>Normal lunch start<input id="lunchStart" type="time"></label>
+              <label>Normal lunch end<input id="lunchEnd" type="time"></label>
+            </div>
+            <div class="grid two">
+              <label>Night shift start<input id="nightStart" type="time"></label>
+              <label>Night shift end<input id="nightEnd" type="time"></label>
+            </div>
+            <div class="grid three">
+              <label>Normal rate / hour<input id="normalRate" type="number" min="0" step="0.01"></label>
+              <label>OT rate / hour<input id="otRate" type="number" min="0" step="0.01"></label>
+              <label>Night shift rate / hour<input id="nightRate" type="number" min="0" step="0.01"></label>
+            </div>
+            <button class="primary" type="submit">Save Settings</button>
+          </form>
+
+          <hr>
+          <div class="grid two">
+            <div>
+              <h3>Lorries</h3>
+              <form id="lorryForm" class="inline-form">
+                <input id="lorryPlate" placeholder="Plate number" maxlength="20" required>
+                <button class="secondary">Add</button>
+              </form>
+              <div id="lorryList" class="chips"></div>
+            </div>
+            <div class="hidden" aria-hidden="true">
+              <div id="driverList"></div>
+            </div>
+          </div>
+
+          <hr>
+          <h3>Public Holidays</h3>
+          <form id="holidayForm" class="inline-form">
+            <input id="holidayDate" type="date" required>
+            <input id="holidayName" placeholder="Holiday name" maxlength="80" required>
+            <button class="secondary">Add</button>
+          </form>
+          <div id="holidayList" class="chips"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="correctionDialog" class="correction-dialog">
+    <form id="correctionForm" method="dialog">
+      <div class="section-head">
+        <div>
+          <h2>Correct Work Entry</h2>
+          <p id="correctionOriginal" class="muted"></p>
+        </div>
+        <button id="correctionClose" class="link-btn" type="button">Close</button>
+      </div>
+      <input id="correctionEntryId" type="hidden">
+
+      <label>Lorry<select id="correctionLorry" required></select></label>
+
+      <div class="grid two">
+        <label>Corrected Start<input id="correctionStart" type="time" step="60" required></label>
+        <label>Corrected End<input id="correctionEnd" type="time" step="60" required></label>
+      </div>
+
+      <label style="flex-direction:row;align-items:center;gap:10px;font-weight:600">
+        <input id="correctionPH" type="checkbox" style="width:auto">
+        Public Holiday entitlement
+      </label>
+
+      <label>Correction reason
+        <textarea id="correctionReason" rows="3" maxlength="300" required placeholder="Why is this entry being corrected?"></textarea>
+      </label>
+
+      <div id="correctionPreview" class="preview"></div>
+
+      <div class="actions">
+        <button class="primary" type="submit">Save Correction</button>
+        <button id="correctionCancel" class="secondary" type="button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="./app.js?v=20261003-01"></script>
+</body>
+</html>
