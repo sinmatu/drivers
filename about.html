@@ -4,108 +4,109 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#b91c1c">
-  <title>About | Lorry System</title>
+  <title>Sin Matu Enterprise Sdn. Bhd.</title>
   <style>
-    :root{--red:#b91c1c;--red2:#dc2626;--ink:#111827;--muted:#667085;--line:#e5e7eb;--soft:#f8fafc;--white:#fff}
-    *{box-sizing:border-box} html{scroll-behavior:smooth}
-    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:#fff;line-height:1.65}
+    :root{--red:#b91c1c;--dark:#111827;--muted:#667085;--line:#e5e7eb;--soft:#f8fafc}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--dark);background:#fff;line-height:1.65}
     a{color:inherit}.wrap{width:min(1160px,calc(100% - 40px));margin:auto}
-    .topbar{height:72px;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.14);position:absolute;inset:0 0 auto;z-index:3;color:#fff}
-    .nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{font-weight:850;letter-spacing:-.02em;text-decoration:none;font-size:1.08rem}.brand small{display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:650;opacity:.72}
-    .back{border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:8px 15px;text-decoration:none;font-size:.9rem;font-weight:700}
-    .hero{min-height:530px;background:linear-gradient(115deg,rgba(17,24,39,.96),rgba(17,24,39,.82)),linear-gradient(135deg,#991b1b,#111827);color:#fff;display:flex;align-items:flex-end;position:relative;overflow:hidden}
-    .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.1)}
-    .hero:before{width:520px;height:520px;right:-120px;top:-130px}.hero:after{width:320px;height:320px;right:70px;top:-30px}
-    .hero-mark{position:absolute;right:6%;bottom:-78px;font-size:20rem;font-weight:900;line-height:1;color:rgba(255,255,255,.035);letter-spacing:-.12em}
-    .hero-inner{padding:145px 0 82px;position:relative;z-index:1;max-width:790px}
-    .eyebrow{display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:.18em;font-size:.76rem;font-weight:800;color:#fecaca}.eyebrow:before{content:"";width:34px;height:2px;background:#ef4444}
-    h1{font-size:clamp(3rem,7vw,6.1rem);line-height:.91;letter-spacing:-.055em;margin:22px 0 28px;max-width:760px}
-    .lead{font-size:clamp(1.05rem,2vw,1.3rem);max-width:700px;color:#d1d5db;margin:0}
-    .section{padding:86px 0}.intro{display:grid;grid-template-columns:.75fr 1.45fr;gap:80px;align-items:start}
-    .kicker{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--red);font-weight:850;margin-bottom:10px}
-    h2{font-size:clamp(2rem,4vw,3.25rem);line-height:1.05;letter-spacing:-.04em;margin:0}
-    .copy{font-size:1.06rem;color:#475467}.copy p:first-child{margin-top:0}.copy strong{color:var(--ink)}
+    .topbar{position:absolute;inset:0 0 auto;z-index:5;height:72px;display:flex;align-items:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.14)}
+    .nav{display:flex;justify-content:space-between;align-items:center;gap:20px}
+    .brand{text-decoration:none;font-weight:850;letter-spacing:-.02em}
+    .brand small{display:block;font-size:.68rem;text-transform:uppercase;letter-spacing:.13em;font-weight:650;opacity:.72}
+    .back{padding:8px 15px;border:1px solid rgba(255,255,255,.48);border-radius:999px;text-decoration:none;font-size:.9rem;font-weight:750}
+    .hero{min-height:590px;display:flex;align-items:flex-end;color:#fff;position:relative;overflow:hidden;background:linear-gradient(115deg,rgba(17,24,39,.96),rgba(17,24,39,.78)),linear-gradient(135deg,#991b1b,#111827)}
+    .hero:before{content:"";position:absolute;right:-120px;top:-170px;width:590px;height:590px;border:1px solid rgba(255,255,255,.12);border-radius:50%}
+    .hero:after{content:"SME";position:absolute;right:3%;bottom:-88px;font-size:18rem;font-weight:900;letter-spacing:-.1em;line-height:1;color:rgba(255,255,255,.035)}
+    .hero-inner{position:relative;z-index:1;padding:155px 0 88px;max-width:850px}
+    .eyebrow{display:flex;align-items:center;gap:11px;color:#fecaca;font-size:.76rem;text-transform:uppercase;letter-spacing:.18em;font-weight:850}
+    .eyebrow:before{content:"";width:36px;height:2px;background:#ef4444}
+    h1{margin:23px 0 26px;font-size:clamp(3rem,7vw,6rem);line-height:.94;letter-spacing:-.055em}
+    .lead{margin:0;max-width:720px;color:#d1d5db;font-size:clamp(1.05rem,2vw,1.3rem)}
+    .section{padding:88px 0}
+    .intro{display:grid;grid-template-columns:.8fr 1.4fr;gap:82px;align-items:start}
+    .kicker{color:var(--red);font-size:.77rem;font-weight:850;text-transform:uppercase;letter-spacing:.16em;margin-bottom:12px}
+    h2{margin:0;font-size:clamp(2rem,4vw,3.3rem);line-height:1.05;letter-spacing:-.04em}
+    .copy{font-size:1.07rem;color:#475467}.copy p:first-child{margin-top:0}.copy strong{color:var(--dark)}
     .facts{background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
     .fact-grid{display:grid;grid-template-columns:repeat(3,1fr)}
     .fact{padding:46px 38px;border-right:1px solid var(--line)}.fact:first-child{padding-left:0}.fact:last-child{border-right:0}
-    .fact b{display:block;color:var(--red);font-size:2.2rem;line-height:1;margin-bottom:12px;letter-spacing:-.04em}.fact span{color:#667085;font-size:.92rem}
-    .system{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}
-    .panel{background:#111827;color:#fff;border-radius:26px;padding:42px;box-shadow:0 24px 60px rgba(17,24,39,.14);position:relative;overflow:hidden}
-    .panel:after{content:"";position:absolute;width:180px;height:180px;border:34px solid rgba(220,38,38,.16);border-radius:50%;right:-72px;bottom:-75px}
-    .panel h3{font-size:1.55rem;margin:0 0 22px}.feature{display:flex;gap:14px;padding:15px 0;border-top:1px solid rgba(255,255,255,.1)}
-    .feature i{font-style:normal;color:#fca5a5;font-weight:900}.feature span{color:#d1d5db}
-    .cta{background:var(--red);color:#fff;padding:62px 0}.cta-row{display:flex;align-items:center;justify-content:space-between;gap:30px}.cta h2{font-size:clamp(1.8rem,4vw,3rem)}
-    .cta p{margin:8px 0 0;color:#fee2e2}.btn{display:inline-block;white-space:nowrap;background:#fff;color:#991b1b;text-decoration:none;font-weight:800;padding:13px 20px;border-radius:999px}
-    footer{background:#0b0f19;color:#98a2b3;padding:28px 0;font-size:.86rem}.foot{display:flex;justify-content:space-between;gap:20px;align-items:center}.foot a{color:#fff;text-decoration:none}
-    @media(max-width:760px){.wrap{width:min(100% - 28px,1160px)}.hero{min-height:500px}.hero-inner{padding:130px 0 64px}.hero-mark{font-size:12rem;right:-20px}.intro,.system{grid-template-columns:1fr;gap:32px}.section{padding:62px 0}.fact-grid{grid-template-columns:1fr}.fact,.fact:first-child{padding:28px 0;border-right:0;border-bottom:1px solid var(--line)}.fact:last-child{border-bottom:0}.panel{padding:28px 24px;border-radius:20px}.cta-row,.foot{align-items:flex-start;flex-direction:column}.topbar{height:64px}.brand small{display:none}}
+    .fact b{display:block;font-size:2.15rem;color:var(--red);line-height:1;margin-bottom:12px;letter-spacing:-.035em}
+    .fact span{display:block;color:var(--muted);font-size:.93rem}
+    .operations{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+    .card{background:var(--dark);color:#fff;border-radius:26px;padding:42px;box-shadow:0 22px 55px rgba(17,24,39,.14)}
+    .card h3{margin:0 0 20px;font-size:1.6rem}.item{padding:15px 0;border-top:1px solid rgba(255,255,255,.1);color:#d1d5db}.item strong{color:#fca5a5;margin-right:10px}
+    .band{background:var(--red);color:#fff;padding:60px 0}.band h2{max-width:850px}.band p{margin:14px 0 0;color:#fee2e2;max-width:720px}
+    footer{background:#0b0f19;color:#98a2b3;padding:28px 0;font-size:.86rem}
+    .foot{display:flex;justify-content:space-between;align-items:center;gap:20px}.foot a{color:#fff;text-decoration:none}
+    @media(max-width:760px){
+      .wrap{width:min(100% - 28px,1160px)}.topbar{height:64px}.brand small{display:none}.hero{min-height:510px}.hero-inner{padding:130px 0 65px}.hero:after{font-size:10rem;right:-10px;bottom:-35px}
+      .section{padding:62px 0}.intro,.operations{grid-template-columns:1fr;gap:34px}.fact-grid{grid-template-columns:1fr}.fact,.fact:first-child{padding:28px 0;border-right:0;border-bottom:1px solid var(--line)}.fact:last-child{border-bottom:0}.card{padding:28px 24px;border-radius:20px}.foot{align-items:flex-start;flex-direction:column}
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap nav">
-      <a class="brand" href="./index.html">Lorry System<small>Sin Matu Enterprise Sdn. Bhd.</small></a>
-      <a class="back" href="./index.html">Back to System</a>
+      <a class="brand" href="./about.html">Sin Matu Enterprise<small>Sin Matu Enterprise Sdn. Bhd.</small></a>
+      <a class="back" href="./index.html">Back</a>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <div class="hero-mark">SM</div>
       <div class="wrap hero-inner">
-        <div class="eyebrow">About</div>
-        <h1>Moving operations forward.</h1>
-        <p class="lead">A dedicated lorry work-hours and reconciliation system supporting the transport operations of Sin Matu Enterprise Sdn. Bhd.</p>
+        <div class="eyebrow">Company Profile</div>
+        <h1>Sin Matu Enterprise Sdn. Bhd.</h1>
+        <p class="lead">Supporting construction-material distribution, import and export, logistics, and operational activities in Labuan.</p>
       </div>
     </section>
 
     <section class="section">
       <div class="wrap intro">
         <div>
-          <div class="kicker">Company</div>
-          <h2>Sin Matu Enterprise Sdn. Bhd.</h2>
+          <div class="kicker">About Us</div>
+          <h2>Built to support the movement of materials and operations.</h2>
         </div>
         <div class="copy">
-          <p><strong>Established in 1997,</strong> Sin Matu Enterprise Sdn. Bhd. engages in the wholesale distribution of construction materials as well as import and export operations, providing logistical and supply-chain support to the wider Sin Matu Group.</p>
-          <p>The company strengthened its operational capabilities through its main operational hub at reclaimed land off Jalan Patau-Patau, Labuan, commencing operations there in 2005.</p>
-          <p>Its in-house fleet includes transportation and construction equipment such as <strong>lorries, shovels and excavators</strong>, supporting efficient material handling, logistics and site operations.</p>
+          <p><strong>Sin Matu Enterprise Sdn. Bhd. was established in 1997.</strong> The company engages in the wholesale distribution of construction materials as well as import and export operations.</p>
+          <p>As part of its continuing operational development, the company commenced operations at its main hub on reclaimed land off Jalan Patau-Patau, Labuan, in 2005.</p>
+          <p>With its own transportation and construction equipment, Sin Matu Enterprise is able to support material handling, logistics and site operations efficiently.</p>
         </div>
       </div>
     </section>
 
     <section class="facts">
       <div class="wrap fact-grid">
-        <div class="fact"><b>1997</b><span>Company established</span></div>
-        <div class="fact"><b>2005</b><span>Operational hub commenced operations</span></div>
-        <div class="fact"><b>Labuan</b><span>Main operational hub at Jalan Patau-Patau</span></div>
+        <div class="fact"><b>1997</b><span>Sin Matu Enterprise Sdn. Bhd. established</span></div>
+        <div class="fact"><b>2005</b><span>Main operational hub commenced operations</span></div>
+        <div class="fact"><b>Labuan</b><span>Operations based off Jalan Patau-Patau</span></div>
       </div>
     </section>
 
     <section class="section">
-      <div class="wrap system">
+      <div class="wrap operations">
         <div>
-          <div class="kicker">Lorry System</div>
-          <h2>Built around daily transport operations.</h2>
+          <div class="kicker">Operations</div>
+          <h2>In-house resources for day-to-day work.</h2>
           <div class="copy">
-            <p>The Lorry System provides a focused workspace for recording work performed by the fleet, reviewing submitted hours, and reconciling operational records and amounts.</p>
-            <p>It keeps day-to-day entries simple while giving staff and management a consistent record for reporting and review.</p>
+            <p>The company maintains transportation and construction equipment to support its operations, helping move construction materials and carry out related site work when required.</p>
           </div>
         </div>
-        <div class="panel">
-          <h3>What the system covers</h3>
-          <div class="feature"><i>01</i><span>Work entries by lorry, date, start time and end time</span></div>
-          <div class="feature"><i>02</i><span>Normal, overtime, lunch OT and night-shift calculations</span></div>
-          <div class="feature"><i>03</i><span>Public-holiday handling and automatic shift numbering</span></div>
-          <div class="feature"><i>04</i><span>Records, review workflow, reconciliation and reports</span></div>
-          <div class="feature"><i>05</i><span>Per-lorry totals, subtotals and consolidated grand totals</span></div>
+        <div class="card">
+          <h3>Operational Equipment</h3>
+          <div class="item"><strong>01</strong> Lorries</div>
+          <div class="item"><strong>02</strong> Shovels</div>
+          <div class="item"><strong>03</strong> Excavators</div>
         </div>
       </div>
     </section>
 
-    <section class="cta">
-      <div class="wrap cta-row">
-        <div><h2>Built for the work behind every trip.</h2><p>Simple records. Clear hours. Better reconciliation.</p></div>
-        <a class="btn" href="./index.html">Open Lorry System →</a>
+    <section class="band">
+      <div class="wrap">
+        <div class="kicker" style="color:#fecaca">Sin Matu Enterprise Sdn. Bhd.</div>
+        <h2>Wholesale distribution, logistics and operational support.</h2>
+        <p>A focused company profile for Sin Matu Enterprise Sdn. Bhd.</p>
       </div>
     </section>
   </main>
@@ -113,7 +114,7 @@
   <footer>
     <div class="wrap foot">
       <span>© 2026 Sin Matu Enterprise Sdn. Bhd.</span>
-      <a href="https://sinmatu.com/companies/sin-matu-enterprise-sdn-bhd/" target="_blank" rel="noopener">Company Website ↗</a>
+      <a href="https://sinmatu.com/companies/sin-matu-enterprise-sdn-bhd/" target="_blank" rel="noopener">Official company page ↗</a>
     </div>
   </footer>
 </body>
