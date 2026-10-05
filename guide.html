@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Lorry System User Guide</title>
+<meta name="description" content="Operational user guide for the Lorry System work-hour, review and reporting workflow.">
+<style>
+:root{
+  --bg:#f6f7fb;--paper:#ffffff;--paper2:#fff8f8;--line:#e6e8ef;
+  --text:#1f2937;--muted:#6b7280;--red:#d71920;--red2:#a70f15;
+  --soft:#fde8e8;--green:#138a55;--amber:#b56b00;--blue:#2457c5;
+  --shadow:0 14px 38px rgba(20,28,45,.08);--max:1180px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{
+  margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--text);line-height:1.58;
+  background:
+    radial-gradient(circle at 15% 0%,rgba(215,25,32,.08),transparent 30%),
+    linear-gradient(180deg,#fff 0,#f7f8fb 220px,#f6f7fb 100%);
+}
+a{color:inherit}
+.wrap{width:min(var(--max),calc(100% - 28px));margin:auto}
+.hero{padding:54px 0 28px}
+.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid #f2c7c9;background:#fff5f5;color:var(--red2);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+h1{font-size:clamp(36px,6vw,64px);line-height:1.02;margin:16px 0 14px;letter-spacing:-.045em}
+.hero p{max-width:850px;color:var(--muted);font-size:clamp(16px,2vw,19px);margin:0}
+.quicknav{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.quicknav a{text-decoration:none;border:1px solid var(--line);background:#fff;padding:9px 12px;border-radius:10px;font-size:13px;color:#374151;box-shadow:0 3px 12px rgba(0,0,0,.03)}
+.quicknav a:hover{border-color:#efb3b6;color:var(--red2);background:#fff8f8}
+.section{padding:28px 0}
+.section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}
+.section h2{margin:0;font-size:clamp(24px,4vw,34px);letter-spacing:-.03em}
+.kicker{color:var(--red);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.sub{color:var(--muted);font-size:14px;max-width:720px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 7px;font-size:17px}.card p{margin:0;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sequence{counter-reset:seq;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sequence a{counter-increment:seq;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px;font-size:14px;box-shadow:0 4px 16px rgba(20,28,45,.04)}
+.sequence a:before{content:counter(seq,decimal-leading-zero) "  ";color:var(--red);font-weight:900}
+.sequence a:hover{border-color:#efb3b6;background:#fffafa}
+.flow{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding-bottom:2px}
+.step{flex:1 0 150px;min-width:150px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 4px 16px rgba(20,28,45,.04)}
+.step b{display:block;font-size:13px;margin-bottom:4px}.step span{display:block;font-size:12px;color:var(--muted)}
+.arrow{align-self:center;color:var(--red);font-size:22px;font-weight:900;padding:0 2px}
+.note{border-left:4px solid var(--red);background:#fff6f6;border-radius:10px;padding:12px 14px;color:#5d2528;font-size:13px;margin-top:12px}
+.note.warn{border-left-color:#e28a00;background:#fff9ec;color:#6c4b13}
+.note.ok{border-left-color:#1c9b61;background:#effbf5;color:#245f44}
+.list{display:grid;gap:9px;margin-top:12px}.item{display:flex;gap:10px;align-items:flex-start}
+.dot{width:8px;height:8px;border-radius:999px;background:var(--red);margin-top:7px;flex:0 0 auto}
+.item div{font-size:14px;color:var(--muted)}.item strong{color:var(--text)}
+.table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 4px 16px rgba(20,28,45,.04)}
+.table th,.table td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+.table th{background:#fff3f3;color:#7b2024}.table td{color:var(--muted)}.table tr:last-child td{border-bottom:0}
+.tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid currentColor}
+.red{color:var(--red2)}.green{color:var(--green)}.amber{color:var(--amber)}.blue{color:var(--blue)}
+.rule{display:grid;grid-template-columns:180px 1fr;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.rule:last-child{border-bottom:0}.rule b{color:#7b2024}.rule span{color:var(--muted);font-size:14px}
+.backtop{display:inline-flex;margin-top:12px;text-decoration:none;color:var(--red2);font-weight:800;font-size:13px}
+footer{padding:40px 0 54px;color:#8a909c;font-size:12px;text-align:center}
+@media(max-width:860px){
+  .grid,.grid.two,.sequence{grid-template-columns:1fr}.section-title{display:block}.flow{display:grid;overflow:visible}
+  .step{min-width:0}.arrow{transform:rotate(90deg);text-align:center;padding:0}.table{display:block;overflow-x:auto;white-space:nowrap}.rule{grid-template-columns:1fr;gap:3px}
+}
+@media(max-width:520px){.hero{padding-top:34px}.wrap{width:min(100% - 20px,var(--max))}.card{padding:15px}.quicknav a{font-size:12px;padding:8px 10px}.section{padding:23px 0}}
+</style>
+</head>
+<body>
+<header class="hero" id="top"><div class="wrap">
+  <div class="badge">Lorry System · Work Hours & Reports</div>
+  <h1>User Guide</h1>
+  <p>This guide explains the normal working flow of the Lorry System: select the active lorry, enter work hours, review records, correct or check entries, then prepare monthly reports and exports.</p>
+  <nav class="quicknav" aria-label="Guide sections">
+    <a href="#roles">1. Roles</a>
+    <a href="#entry">2. Work Entry</a>
+    <a href="#records">3. Records</a>
+    <a href="#review">4. Review Queue</a>
+    <a href="#calculation">5. Hour Calculation</a>
+    <a href="#reports">6. Reports</a>
+    <a href="#settings">7. Manager Settings</a>
+    <a href="#goodpractice">8. Good Practice</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+<section class="section">
+  <div class="section-title"><div><div class="kicker">Normal Workflow</div><h2>Use the system in this order</h2></div><div class="sub">The system is designed to keep data entry simple while preserving enough detail for checking and reporting.</div></div>
+  <div class="sequence">
+    <a href="#roles">Sign in with the assigned account</a>
+    <a href="#entry">Select the active lorry and enter work hours</a>
+    <a href="#records">Check submitted work in Records</a>
+    <a href="#review">Review, correct or mark entries checked</a>
+    <a href="#reports">Prepare monthly lorry reports</a>
+    <a href="#reports">Export Excel or PDF when required</a>
+  </div>
+  <div class="note"><strong>Core rule:</strong> the system records work against the selected lorry. Always confirm the Active Lorry before submitting entries.</div>
+</section>
+
+<section id="roles" class="section">
+  <div class="section-title"><div><div class="kicker">01 · Roles</div><h2>Manager and Staff</h2></div><div class="sub">There are only two supported user roles. There is no separate Driver login in the current system.</div></div>
+  <div class="grid two">
+    <div class="card"><h3>Staff</h3><p>Staff can enter work, open Records, use the Review Queue, view Reports and see calculated amounts in Review and Reports.</p></div>
+    <div class="card"><h3>Manager</h3><p>Manager has the same operational access plus Manager-only controls such as Settings and Void Entry.</p></div>
+  </div>
+  <div class="note ok"><strong>Simple access model:</strong> Staff handles daily operations. Manager maintains the system rules and has the additional authority needed for administration.</div>
+</section>
+
+<section id="entry" class="section">
+  <div class="section-title"><div><div class="kicker">02 · Work Entry</div><h2>Key in work against the active lorry</h2></div><div class="sub">Work Entry supports one or many rows in one submission. Shift numbering is automatic.</div></div>
+  <div class="flow">
+    <div class="step"><b>1. Select Active Lorry</b><span>Choose the correct lorry in the session bar.</span></div><div class="arrow">→</div>
+    <div class="step"><b>2. Enter Date</b><span>Select the work date.</span></div><div class="arrow">→</div>
+    <div class="step"><b>3. Enter Start & End</b><span>Use the actual work times.</span></div><div class="arrow">→</div>
+    <div class="step"><b>4. PH Entitlement</b><span>Tick Public Holiday when applicable.</span></div><div class="arrow">→</div>
+    <div class="step"><b>5. Add More Rows</b><span>Use + Add Entry for additional work periods.</span></div><div class="arrow">→</div>
+    <div class="step"><b>6. Submit</b><span>The system validates overlaps and assigns shifts.</span></div>
+  </div>
+
+  <div class="grid two" style="margin-top:14px">
+    <div class="card"><h3>Automatic Shift Number</h3><p>The first work period for a lorry on a date becomes Shift 1. The next non-overlapping work period becomes Shift 2, then Shift 3, and so on.</p></div>
+    <div class="card"><h3>Overlap Protection</h3><p>The system checks new rows against each other and against existing active work entries for the same lorry. Overlapping work should be corrected before submission.</p></div>
+  </div>
+
+  <div class="note warn"><strong>Overnight entry:</strong> if End is earlier than Start, the system treats the End time as the next calendar day. In Records and Reports, the actual end date is shown so the overnight period is clear.</div>
+</section>
+
+<section id="records" class="section">
+  <div class="section-title"><div><div class="kicker">03 · Records</div><h2>Records are the operational work history</h2></div><div class="sub">Records intentionally focus on work information rather than money.</div></div>
+  <table class="table">
+    <thead><tr><th>Field</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Date</td><td>Work date, sortable newest or oldest first.</td></tr>
+      <tr><td>Lorry</td><td>The lorry the work belongs to.</td></tr>
+      <tr><td>Shift</td><td>Automatically assigned Shift 1, Shift 2, and so on.</td></tr>
+      <tr><td>Start / End</td><td>Actual work period. Overnight End shows the actual next date.</td></tr>
+      <tr><td>Hours</td><td>Total calculated work hours in decimal-hour format.</td></tr>
+      <tr><td>Status</td><td>Shows the current review state and whether a correction has been applied.</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><strong>No amount column in Records.</strong> This keeps Records focused on work history. Amounts belong in Review and Reports.</div>
+</section>
+
+<section id="review" class="section">
+  <div class="section-title"><div><div class="kicker">04 · Review Queue</div><h2>Check and correct submitted work</h2></div><div class="sub">Review is placed inside Records under the Review Queue tab.</div></div>
+  <div class="grid">
+    <div class="card"><h3>Mark Checked</h3><p>Use when the submitted entry is correct and no changes are required.</p></div>
+    <div class="card"><h3>Correction Required</h3><p>Use when the entry needs to be corrected before it is considered final.</p></div>
+    <div class="card"><h3>Correct Entry</h3><p>Update the lorry, Start, End, Public Holiday entitlement and correction reason. The original submission is retained for reference.</p></div>
+  </div>
+  <div class="note warn"><strong>Manager-only:</strong> Void Entry excludes an incorrect record from normal Records, Reports and overlap checking while preserving the audit record in Firestore.</div>
+</section>
+
+<section id="calculation" class="section">
+  <div class="section-title"><div><div class="kicker">05 · Hour Calculation</div><h2>Normal, OT and Night Shift</h2></div><div class="sub">All payable work is grouped into three main categories.</div></div>
+  <div class="grid">
+    <div class="card"><h3><span class="tag blue">Normal</span></h3><p>Hours within the configured normal working window that do not fall into a higher-priority category.</p></div>
+    <div class="card"><h3><span class="tag amber">OT</span></h3><p>OT includes after-hours work, Sunday/off-day work, Public Holiday entitlement and lunch overtime under the configured rules.</p></div>
+    <div class="card"><h3><span class="tag red">Night Shift</span></h3><p>Hours inside the configured night window. Night Shift has priority over OT and Normal.</p></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="rule"><b>Priority</b><span>Night Shift → OT → Normal.</span></div>
+    <div class="rule"><b>Decimal hours</b><span>Hours are displayed as decimals. Example: 2 hours 30 minutes = 2.50 hours; 1 hour 59 minutes = 1.98 hours after rounding.</span></div>
+    <div class="rule"><b>Sunday / Off Day</b><span>Counted under OT.</span></div>
+    <div class="rule"><b>Public Holiday</b><span>When PH entitlement is ticked and the date matches a configured Public Holiday, eligible hours are counted under OT unless Night Shift takes priority.</span></div>
+    <div class="rule"><b>Lunch OT</b><span>The configured lunch window is treated as OT and included in the OT total.</span></div>
+  </div>
+</section>
+
+<section id="reports" class="section">
+  <div class="section-title"><div><div class="kicker">06 · Reports</div><h2>Use Reports for final totals and export</h2></div><div class="sub">Reports are the printable/exportable view. Unlike Records, Reports include the detailed hours and amounts.</div></div>
+
+  <div class="flow">
+    <div class="step"><b>Select Month</b><span>Choose the reporting month.</span></div><div class="arrow">→</div>
+    <div class="step"><b>Select Lorry</b><span>Choose one lorry or All Lorries.</span></div><div class="arrow">→</div>
+    <div class="step"><b>Review Details</b><span>Check Date, Shift, Start, End and hour categories.</span></div><div class="arrow">→</div>
+    <div class="step"><b>Check Totals</b><span>Normal, OT, Night Shift, Total Hours and Amount.</span></div><div class="arrow">→</div>
+    <div class="step"><b>Export</b><span>Download Excel or PDF.</span></div>
+  </div>
+
+  <div class="grid two" style="margin-top:14px">
+    <div class="card"><h3>One Lorry Selected</h3><p>The report shows the detailed entries for that lorry and ends with <strong>Total</strong>.</p></div>
+    <div class="card"><h3>All Lorries Selected</h3><p>Each lorry section ends with <strong>Subtotal</strong>, followed by a final <strong>Grand Total</strong> that sums all lorries.</p></div>
+  </div>
+
+  <table class="table" style="margin-top:14px">
+    <thead><tr><th>Report Detail</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td>Normal hrs</td><td>Total Normal hours.</td></tr>
+      <tr><td>OT hrs</td><td>Total OT hours, including eligible Sunday/off-day, PH and lunch OT.</td></tr>
+      <tr><td>Night Shift hrs</td><td>Total hours counted under the Night Shift category.</td></tr>
+      <tr><td>Total hrs</td><td>Normal + OT + Night Shift.</td></tr>
+      <tr><td>Amount</td><td>Calculated from the configured hourly rates. Currency is shown with thousands separators, for example RM 12,450.75.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note ok"><strong>Exports:</strong> Excel and PDF follow the same report order: detailed entries → Total or Subtotal → Grand Total when All Lorries is selected.</div>
+</section>
+
+<section id="settings" class="section">
+  <div class="section-title"><div><div class="kicker">07 · Manager Settings</div><h2>Maintain the calculation rules</h2></div><div class="sub">Settings is Manager-only because changes here affect future hour and amount calculations.</div></div>
+  <div class="grid two">
+    <div class="card"><h3>Working Hours</h3><p>Normal start, Normal end, Saturday normal end, lunch start/end and Night Shift start/end.</p></div>
+    <div class="card"><h3>Rates</h3><p>Normal rate/hour, OT rate/hour and Night Shift rate/hour.</p></div>
+    <div class="card"><h3>Lorries</h3><p>Add and maintain the lorry list used by Work Entry, Records and Reports.</p></div>
+    <div class="card"><h3>Public Holidays</h3><p>Add Public Holiday dates and names so PH entitlement can be calculated correctly.</p></div>
+  </div>
+  <div class="note warn"><strong>Before changing rates or time boundaries:</strong> confirm the business rule first. Settings directly affect calculated categories and amounts.</div>
+</section>
+
+<section id="goodpractice" class="section">
+  <div class="section-title"><div><div class="kicker">08 · Good Practice</div><h2>Keep the records reliable</h2></div><div class="sub">Most problems can be avoided by following a few simple habits.</div></div>
+  <div class="list">
+    <div class="item"><span class="dot"></span><div><strong>Confirm the Active Lorry before key-in.</strong> Every row in the batch is submitted against that selected lorry.</div></div>
+    <div class="item"><span class="dot"></span><div><strong>Use the actual Start and End times.</strong> Do not round times unless the business process specifically requires it.</div></div>
+    <div class="item"><span class="dot"></span><div><strong>Tick PH entitlement correctly.</strong> This affects the category calculation.</div></div>
+    <div class="item"><span class="dot"></span><div><strong>Use Review for corrections.</strong> Avoid creating a second overlapping entry to replace a wrong one.</div></div>
+    <div class="item"><span class="dot"></span><div><strong>Use Reports for final checking and export.</strong> Records is the operational history; Reports is the reporting document.</div></div>
+    <div class="item"><span class="dot"></span><div><strong>Do not delete history manually.</strong> Manager Void keeps the audit trail while excluding an invalid entry from normal calculations.</div></div>
+  </div>
+  <a class="backtop" href="#top">↑ Back to top</a>
+</section>
+</main>
+
+<footer>
+  Lorry System User Guide · noagrp/drivers
+</footer>
+</body>
+</html>
