@@ -13,7 +13,7 @@
     .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
     .topbar{position:absolute;inset:0 0 auto;z-index:5;height:70px;display:flex;align-items:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.12)}
     .nav{display:flex;align-items:center;justify-content:space-between}
-    .brand{font-weight:850;letter-spacing:-.02em}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.02em}.brand img{display:block;width:42px;height:42px;object-fit:contain;flex:0 0 auto}.brand span{display:block}
     .hero{min-height:460px;display:flex;align-items:flex-end;color:#fff;position:relative;overflow:hidden;background:linear-gradient(115deg,rgba(17,24,39,.97),rgba(17,24,39,.78)),linear-gradient(135deg,#991b1b,#111827)}
     .hero:before{content:"";position:absolute;right:-130px;top:-180px;width:560px;height:560px;border:1px solid rgba(255,255,255,.12);border-radius:50%}
     .hero:after{content:"SM";position:absolute;right:4%;bottom:-58px;font-size:16rem;font-weight:900;line-height:1;letter-spacing:-.1em;color:rgba(255,255,255,.035)}
@@ -42,11 +42,11 @@
     .card-actions .system{background:#fff;color:#991b1b}
     footer{background:#0b0f19;color:#98a2b3;padding:26px 0;font-size:.86rem}
     .foot{display:flex;justify-content:space-between;gap:20px;align-items:center}.foot span:last-child{color:#d1d5db}
-    @media(max-width:720px){.wrap{width:min(100% - 28px,1120px)}.topbar{height:62px}.hero{min-height:420px}.hero-inner{padding:120px 0 58px}.hero:after{font-size:10rem;right:-10px;bottom:-25px}.apps{padding:56px 0 64px}.grid{grid-template-columns:1fr}.card{min-height:220px;padding:25px}.foot{flex-direction:column;align-items:flex-start}}
+    @media(max-width:720px){.wrap{width:min(100% - 28px,1120px)}.topbar{height:62px}.brand{gap:8px;font-size:.9rem}.brand img{width:34px;height:34px}.hero{min-height:420px}.hero-inner{padding:120px 0 58px}.hero:after{font-size:10rem;right:-10px;bottom:-25px}.apps{padding:56px 0 64px}.grid{grid-template-columns:1fr}.card{min-height:220px;padding:25px}.foot{flex-direction:column;align-items:flex-start}}
   </style>
 </head>
 <body>
-  <header class="topbar"><div class="wrap nav"><div class="brand">Sin Matu Enterprise Sdn. Bhd.</div></div></header>
+  <header class="topbar"><div class="wrap nav"><div class="brand"><img src="./Sin%20Matu%20Logo.png" alt="Sin Matu Enterprise Sdn. Bhd. logo"><span>Sin Matu Enterprise Sdn. Bhd.</span></div></div></header>
   <main>
     <section class="hero">
       <div class="wrap hero-inner">
