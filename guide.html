@@ -25,6 +25,9 @@ body{
 a{color:inherit}
 .wrap{width:min(var(--max),calc(100% - 28px));margin:auto}
 .hero{padding:54px 0 28px}
+.brandline{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.brandline img{display:block;width:clamp(96px,14vw,150px);height:auto;object-fit:contain}
+.brandline span{color:#4b5563;font-size:13px;font-weight:800;letter-spacing:.02em}
 .badge{display:inline-flex;align-items:center;gap:7px;border:1px solid #f2c7c9;background:#fff5f5;color:var(--red2);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 h1{font-size:clamp(36px,6vw,64px);line-height:1.02;margin:16px 0 14px;letter-spacing:-.045em}
 .hero p{max-width:850px;color:var(--muted);font-size:clamp(16px,2vw,19px);margin:0}
@@ -66,11 +69,15 @@ footer{padding:40px 0 54px;color:#8a909c;font-size:12px;text-align:center}
   .grid,.grid.two,.sequence{grid-template-columns:1fr}.section-title{display:block}.flow{display:grid;overflow:visible}
   .step{min-width:0}.arrow{transform:rotate(90deg);text-align:center;padding:0}.table{display:block;overflow-x:auto;white-space:nowrap}.rule{grid-template-columns:1fr;gap:3px}
 }
-@media(max-width:520px){.hero{padding-top:34px}.wrap{width:min(100% - 20px,var(--max))}.card{padding:15px}.quicknav a{font-size:12px;padding:8px 10px}.section{padding:23px 0}}
+@media(max-width:520px){.hero{padding-top:34px}.brandline{gap:10px;margin-bottom:15px}.brandline img{width:96px}.brandline span{font-size:12px}.wrap{width:min(100% - 20px,var(--max))}.card{padding:15px}.quicknav a{font-size:12px;padding:8px 10px}.section{padding:23px 0}}
 </style>
 </head>
 <body>
 <header class="hero" id="top"><div class="wrap">
+  <div class="brandline">
+    <img src="./Sin%20Matu%20Logo.png" alt="Sin Matu Enterprise Sdn. Bhd. logo">
+    <span>Sin Matu Enterprise Sdn. Bhd.</span>
+  </div>
   <div class="badge">Lorry System · Work Hours & Reports</div>
   <h1>User Guide</h1>
   <p>This guide explains the normal working flow of the Lorry System: select the active lorry, enter work hours, review records, correct or check entries, then prepare monthly reports and exports.</p>
