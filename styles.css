@@ -13,3 +13,26 @@
   .record-filters{grid-template-columns:1fr}
   .bulk-review{justify-content:space-between;align-items:center}
 }
+
+/* AUS-style Reports layout */
+.reports-panel{padding:24px}
+.reports-head{align-items:center;margin-bottom:18px}
+.reports-head h2{margin:0;font-size:1.45rem}
+.report-controls{display:flex;gap:10px;align-items:center}
+.report-controls input,.report-controls select{min-width:210px;height:46px}
+.reports-panel .summary-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.reports-panel .summary-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px}
+.reports-panel .summary-card .muted{font-size:.82rem}
+.reports-panel .summary-card b{font-size:1.45rem;margin-top:6px}
+.report-table-wrap{margin-top:4px}
+.report-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+@media(max-width:900px){
+  .reports-head{align-items:flex-start;flex-direction:column}
+  .report-controls{width:100%}
+  .report-controls input,.report-controls select{flex:1;min-width:0}
+}
+@media(max-width:760px){
+  .reports-panel{padding:14px}
+  .report-controls{flex-direction:column;align-items:stretch}
+  .reports-panel .summary-grid{grid-template-columns:1fr}
+}
