@@ -20,7 +20,7 @@
 .reports-head h2{margin:0;font-size:1.45rem}
 .report-controls{display:flex;gap:10px;align-items:center}
 .report-controls input,.report-controls select{min-width:210px;height:46px}
-.reports-panel .summary-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.reports-panel .summary-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0}
 .reports-panel .summary-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px}
 .reports-panel .summary-card .muted{font-size:.82rem}
 .reports-panel .summary-card b{font-size:1.45rem;margin-top:6px}
@@ -35,4 +35,8 @@
   .reports-panel{padding:14px}
   .report-controls{flex-direction:column;align-items:stretch}
   .reports-panel .summary-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:1050px) and (min-width:761px){
+  .reports-panel .summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
