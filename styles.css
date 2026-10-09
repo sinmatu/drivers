@@ -40,3 +40,11 @@
 @media(max-width:1050px) and (min-width:761px){
   .reports-panel .summary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+.session-user{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.session-user strong{font-size:1rem;font-weight:700}
+.entry-unit-bar{margin-bottom:18px}
+.entry-unit-bar label{max-width:320px}
+@media(max-width:760px){
+  .entry-unit-bar label{max-width:none;width:100%}
+}
