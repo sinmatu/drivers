@@ -120,17 +120,17 @@
           </div>
         </section>
 
-        <section id="view-reports" class="view panel hidden">
-          <div class="section-head">
+        <section id="view-reports" class="view panel hidden reports-panel">
+          <div class="section-head reports-head">
             <h2>Reports & Reconciliation</h2>
             <div class="report-controls">
-              <input id="reportMonth" type="month">
-              <select id="reportLorry"></select>
+              <input id="reportMonth" type="month" aria-label="Report month">
+              <select id="reportLorry" aria-label="Report lorry"></select>
             </div>
           </div>
           <div id="reportSummary"></div>
-          <div id="reportTable" class="table-wrap"></div>
-          <div class="actions" style="margin-top:12px">
+          <div id="reportTable" class="table-wrap report-table-wrap"></div>
+          <div class="actions report-actions">
             <button id="exportExcel" class="secondary" type="button">Export Excel</button>
             <button id="exportPdf" class="secondary" type="button">Export PDF</button>
           </div>
@@ -226,6 +226,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=20261009-01"></script>
+  <script type="module" src="./app.js?v=20261009-02"></script>
 </body>
 </html>
