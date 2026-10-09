@@ -89,35 +89,34 @@
               <h2>Records</h2>
               <span id="recordCount" class="muted"></span>
             </div>
-            <div class="report-switch record-switch">
-              <button id="recordsModeAll" class="active" type="button">All Records</button>
-              <button id="recordsModeReview" type="button">Review Queue</button>
-            </div>
           </div>
 
-          <div id="recordsAllPane">
-            <div class="filters">
-              <input id="recordMonth" type="month">
-              <select id="recordLorry"></select>
+          <div class="filters record-filters">
+            <label>Month
+              <input id="recordMonth" type="month" aria-label="Record month">
+            </label>
+            <label>Lorry
+              <select id="recordLorry" aria-label="Record lorry"></select>
+            </label>
+            <label>Sort
               <select id="recordSort">
                 <option value="desc">Date ↓ Newest first</option>
                 <option value="asc">Date ↑ Oldest first</option>
               </select>
-              <button id="recordApply" class="secondary">Apply</button>
-            </div>
-            <div id="recordsTable" class="table-wrap"></div>
-            <div class="pager">
-              <button id="prevPage" class="secondary">Previous</button>
-              <span id="pageLabel" class="muted"></span>
-              <button id="nextPage" class="secondary">Next</button>
-            </div>
+            </label>
+            <button id="recordApply" class="secondary record-apply" type="button">Apply</button>
           </div>
 
-          <div id="recordsReviewPane" class="hidden">
-            <div class="section-head">
-              <span class="muted">Pending → Checked → Correction Required</span>
-            </div>
-            <div id="reviewList"></div>
+          <div id="recordBulkBar" class="bulk-review hidden" data-role="manager">
+            <span id="recordSelectedCount" class="muted">0 selected</span>
+            <button id="markSelectedChecked" class="primary" type="button" disabled>Mark Selected Checked</button>
+          </div>
+
+          <div id="recordsTable" class="table-wrap"></div>
+          <div class="pager">
+            <button id="prevPage" class="secondary">Previous</button>
+            <span id="pageLabel" class="muted"></span>
+            <button id="nextPage" class="secondary">Next</button>
           </div>
         </section>
 
@@ -227,6 +226,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=20261003-01"></script>
+  <script type="module" src="./app.js?v=20261009-01"></script>
 </body>
 </html>
