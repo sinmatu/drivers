@@ -70,8 +70,11 @@ async function initFirebase(){
     try{
       const ref=F.doc(db,"users",user.uid),snap=await F.getDoc(ref);
       if(!snap.exists())throw Error("Account is not authorised for this system.");
-      S.role=snap.data().role||"";
+      const profile=snap.data();
+      S.role=profile.role||"";
       if(!["manager","staff"].includes(S.role))throw Error("Account role is missing or not authorised.");
+      if(profile.status!=="active")throw Error("Account is not active.");
+      if(profile.uid && profile.uid!==user.uid)throw Error("Account profile does not match this signed-in user.");
       await masters();
       $("setupBanner").classList.add("hidden");
       showShell();
@@ -109,7 +112,7 @@ function showShell(){
   $("userArea").innerHTML="<strong>"+esc(S.user.displayName||S.user.email||"User")+"</strong>";
   $("roleBadge").textContent=S.role.charAt(0).toUpperCase()+S.role.slice(1);
   document.querySelectorAll("[data-role]").forEach(x=>x.classList.toggle("hidden",!x.dataset.role.split(",").includes(S.role)));
-  selectors();settingsUI();resetEntryRows();records();review();report();setRecordMode("all")
+  selectors();settingsUI();resetEntryRows();records();report()
 }
 function options(items,key,label,first){
   return (first?'<option value="">'+esc(first)+'</option>':"")+items.map(x=>'<option value="'+esc(x[key]||x.id)+'">'+esc(x[label])+'</option>').join("");
@@ -222,7 +225,7 @@ async function submit(e){
     }
     resetEntryRows();
     alert(rows.length+" entr"+(rows.length===1?"y":"ies")+" submitted.");
-    await records();await review();
+    await records();
   }finally{
     if(button)button.disabled=false;
   }
@@ -231,13 +234,52 @@ const ln=(id,fallback="")=>S.lorries.find(x=>x.id===id)?.plate||fallback||"Unkno
 function table(rows){
   if(!rows.length)return '<div style="padding:18px" class="muted">No matching records.</div>';
   const arrow=$("recordSort")?.value==="asc"?"↑":"↓";
-  return "<table><thead><tr><th>Date "+arrow+"</th><th>Lorry</th><th>Shift</th><th>Start</th><th>End</th><th>Hours</th><th>Status</th></tr></thead><tbody>"+
+  const manager=S.role==="manager";
+  const selectHead=manager?'<th class="select-col"><input id="selectVisibleRecords" type="checkbox" aria-label="Select reviewable records on this page"></th>':"";
+  const actionHead=manager?"<th>Review</th>":"";
+  return "<table><thead><tr>"+selectHead+"<th>Date "+arrow+"</th><th>Lorry</th><th>Shift</th><th>Start</th><th>End</th><th>Hours</th><th>Status</th>"+actionHead+"</tr></thead><tbody>"+
   rows.map(x=>{
     const a=new Date(x.correctedStart||x.originalStart),b=new Date(x.correctedEnd||x.originalEnd);
     const corrected=x.correctedStart?" · corrected":"";
     const endDisplay=(x.correctedOvernight??x.overnight)?fmtD(b)+" "+fmtT(b):fmtT(b);
-    return "<tr><td>"+esc(fmtD(a))+"</td><td>"+esc(ln(x.lorryId,x.lorryPlate))+"</td><td>"+esc(x.shiftLabel||("Shift "+(x.shiftNo||"?")))+"</td><td>"+esc(fmtT(a))+"</td><td>"+esc(endDisplay)+"</td><td>"+Number(x.totals?.total||0).toFixed(2)+"</td><td>"+esc((x.status||"pending")+corrected)+"</td></tr>"
+    const status=x.status||"pending";
+    const reviewable=status!=="checked"&&status!=="void";
+    const selectCell=manager?'<td class="select-col">'+(reviewable?'<input class="record-select" type="checkbox" value="'+esc(x.id)+'" aria-label="Select '+esc(ln(x.lorryId,x.lorryPlate))+' '+esc(fmtD(a))+'">':"")+"</td>":"";
+    let actions="";
+    if(manager){
+      const mark=status==="checked"?"":'<button class="record-action" data-status="checked">Mark Checked</button>';
+      const correct='<button class="record-action" data-correct="1">'+(x.correctedStart?"Edit Correction":"Correct Entry")+'</button>';
+      const correction=status==="correction"?"":'<button class="record-action" data-status="correction">Correction Required</button>';
+      const voidBtn='<button class="record-action danger-link" data-void="1">Void Entry</button>';
+      actions='<td><div class="record-actions" data-id="'+esc(x.id)+'">'+mark+correct+correction+voidBtn+'</div></td>';
+    }
+    return "<tr data-record-id='"+esc(x.id)+"'>"+selectCell+"<td>"+esc(fmtD(a))+"</td><td>"+esc(ln(x.lorryId,x.lorryPlate))+"</td><td>"+esc(x.shiftLabel||("Shift "+(x.shiftNo||"?")))+"</td><td>"+esc(fmtT(a))+"</td><td>"+esc(endDisplay)+"</td><td>"+Number(x.totals?.total||0).toFixed(2)+"</td><td>"+esc(status+corrected)+"</td>"+actions+"</tr>"
   }).join("")+"</tbody></table>";
+}
+function updateBulkReview(){
+  if(S.role!=="manager")return;
+  const boxes=[...document.querySelectorAll("#recordsTable .record-select")];
+  const checked=boxes.filter(x=>x.checked);
+  $("recordSelectedCount").textContent=checked.length+" selected";
+  $("markSelectedChecked").disabled=checked.length===0;
+  const master=$("selectVisibleRecords");
+  if(master){
+    master.checked=boxes.length>0&&checked.length===boxes.length;
+    master.indeterminate=checked.length>0&&checked.length<boxes.length;
+  }
+}
+async function markSelectedChecked(){
+  if(S.role!=="manager")return;
+  const ids=[...document.querySelectorAll("#recordsTable .record-select:checked")].map(x=>x.value);
+  if(!ids.length)return;
+  if(S.mode==="demo"){
+    ids.forEach(id=>{const x=S.entries.find(e=>e.id===id);if(x){x.status="checked";x.reviewedBy=S.user.uid;x.reviewedAt=new Date().toISOString()}});
+  }else{
+    const f=S.fb,batch=f.writeBatch(f.db);
+    ids.forEach(id=>batch.update(f.doc(f.db,"workEntries",id),{status:"checked",reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()}));
+    await batch.commit();
+  }
+  await records();
 }
 function range(month){const a=month.split("-").map(Number);return {start:new Date(a[0],a[1]-1,1),end:new Date(a[0],a[1],1)}}
 async function records(){
@@ -246,12 +288,12 @@ async function records(){
     let a=S.entries.filter(x=>x.status!=="void"),m=$("recordMonth").value;if(m)a=a.filter(x=>x.workDate.startsWith(m));
     if($("recordLorry").value)a=a.filter(x=>x.lorryId===$("recordLorry").value);
     const dir=$("recordSort").value==="asc"?1:-1;a.sort((x,y)=>dir*(new Date(x.originalStart)-new Date(y.originalStart)));
-    const st=S.page*25,p=a.slice(st,st+25);$("recordsTable").innerHTML=table(p);$("recordCount").textContent=a.length+" records";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=st+25>=a.length;return;
+    const st=S.page*25,p=a.slice(st,st+25);$("recordsTable").innerHTML=table(p);$("recordCount").textContent=a.length+" records";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=st+25>=a.length;updateBulkReview();return;
   }
   const f=S.fb,m=$("recordMonth").value,q=[];if(m){const r=range(m);q.push(f.where("originalStart",">=",r.start.toISOString()),f.where("originalStart","<",r.end.toISOString()))}
   if($("recordLorry").value)q.push(f.where("lorryId","==",$("recordLorry").value));
   q.push(f.orderBy("originalStart",$("recordSort").value));if(S.page>0&&S.cursors[S.page])q.push(f.startAfter(S.cursors[S.page]));q.push(f.limit(26));
-  try{const snap=await f.getDocs(f.query(f.collection(f.db,"workEntries"),...q)),docs=snap.docs.filter(d=>d.data().status!=="void"),vis=docs.slice(0,25),rows=vis.map(d=>({id:d.id,...d.data()}));$("recordsTable").innerHTML=table(rows);$("recordCount").textContent=rows.length+" shown";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=docs.length<=25;if(docs.length>25&&vis.length)S.cursors[S.page+1]=vis[vis.length-1]}catch(e){$("recordsTable").innerHTML='<div style="padding:18px" class="muted">'+esc(e.message)+"</div>"}
+  try{const snap=await f.getDocs(f.query(f.collection(f.db,"workEntries"),...q)),docs=snap.docs.filter(d=>d.data().status!=="void"),vis=docs.slice(0,25),rows=vis.map(d=>({id:d.id,...d.data()}));$("recordsTable").innerHTML=table(rows);$("recordCount").textContent=rows.length+" shown";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=docs.length<=25;if(docs.length>25&&vis.length)S.cursors[S.page+1]=vis[vis.length-1];updateBulkReview()}catch(e){$("recordsTable").innerHTML='<div style="padding:18px" class="muted">'+esc(e.message)+"</div>"}
 }
 async function review(){
   let rows=[];
@@ -279,7 +321,7 @@ async function review(){
   }).join(""):"<p class='muted'>No pending or correction entries.</p>";
 }
 async function status(id,v){
-  if(S.mode==="demo"){const x=S.entries.find(e=>e.id===id);if(x)x.status=v}else{const f=S.fb;await f.updateDoc(f.doc(f.db,"workEntries",id),{status:v,reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()})}await review();await records();
+  if(S.mode==="demo"){const x=S.entries.find(e=>e.id===id);if(x)x.status=v}else{const f=S.fb;await f.updateDoc(f.doc(f.db,"workEntries",id),{status:v,reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()})}await records();
 }
 async function voidEntry(id){
   if(S.role!=="manager")return;
@@ -290,7 +332,7 @@ async function voidEntry(id){
     const f=S.fb;
     await f.updateDoc(f.doc(f.db,"workEntries",id),{status:"void",voidedBy:S.user.uid,voidedAt:f.serverTimestamp()});
   }
-  await review();await records();await report();
+  await records();await report();
 }
 async function getEntry(id){
   if(S.mode==="demo")return S.entries.find(x=>x.id===id)||null;
@@ -544,16 +586,7 @@ function settingsUI(){const s=S.settings;["normalStart","normalEnd","saturdayEnd
 async function saveSettings(e){e.preventDefault();const n={normalStart:$("normalStart").value,normalEnd:$("normalEnd").value,saturdayEnd:$("saturdayEnd").value,lunchStart:$("lunchStart").value,lunchEnd:$("lunchEnd").value,nightStart:$("nightStart").value,nightEnd:$("nightEnd").value,normalRate:Number($("normalRate").value),otRate:Number($("otRate").value),nightRate:Number($("nightRate").value)};S.settings=n;if(S.mode==="firebase"){const f=S.fb;await f.setDoc(f.doc(f.db,"settings","global"),n,{merge:true})}settingsUI();alert("Settings saved.")}
 async function addMaster(type,value){value=value.trim();if(!value)return;const data=type==="lorries"?{plate:value,active:true}:{name:value,active:true};if(S.mode==="firebase"){const f=S.fb,r=await f.addDoc(f.collection(f.db,type),data);S[type].push({id:r.id,...data})}else S[type].push({id:String(Date.now()),...data});selectors();settingsUI()}
 async function addHoliday(date,name){if(S.mode==="firebase"){const f=S.fb;await f.setDoc(f.doc(f.db,"holidays",date),{date,name})}const h=S.holidays.find(x=>x.date===date);if(h)h.name=name;else S.holidays.push({id:date,date,name});settingsUI()}
-function setRecordMode(mode){
-  S.recordMode=mode;
-  const isReview=mode==="review";
-  $("recordsAllPane").classList.toggle("hidden",isReview);
-  $("recordsReviewPane").classList.toggle("hidden",!isReview);
-  $("recordsModeAll").classList.toggle("active",!isReview);
-  $("recordsModeReview").classList.toggle("active",isReview);
-  if(isReview)review();else records();
-}
-function view(name){document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));$("view-"+name).classList.remove("hidden");document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("active",x.dataset.view===name));if(name==="records")setRecordMode(S.recordMode||"all");if(name==="reports")report()}
+function view(name){document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));$("view-"+name).classList.remove("hidden");document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("active",x.dataset.view===name));if(name==="records")records();if(name==="reports")report()}
 function wire(){
   $("loginForm").onsubmit=async e=>{
     e.preventDefault();
@@ -601,14 +634,23 @@ function wire(){
   $("addEntryRow").onclick=()=>addEntryRow({},true);
   $("entryRows").onclick=e=>{const b=e.target.closest(".remove-entry-row");if(b){b.closest(".entry-row").remove();refreshEntryRows()}};
   $("workForm").onsubmit=submit;
-  $("recordsModeAll").onclick=()=>setRecordMode("all");
-  $("recordsModeReview").onclick=()=>setRecordMode("review");
-  $("recordApply").onclick=()=>{S.page=0;S.cursors=[null];records()};$("nextPage").onclick=()=>{S.page++;records()};$("prevPage").onclick=()=>{if(S.page>0)S.page--;records()};
-  $("reviewList").onclick=e=>{
-    const v=e.target.closest("[data-void]");if(v){voidEntry(v.closest("[data-id]").dataset.id);return}
-    const c=e.target.closest("[data-correct]");if(c){openCorrection(c.closest("[data-id]").dataset.id);return}
-    const b=e.target.closest("[data-status]");if(b)status(b.closest("[data-id]").dataset.id,b.dataset.status)
+  $("recordApply").onclick=()=>{S.page=0;S.cursors=[null];records()};
+  $("recordMonth").onchange=()=>{S.page=0;S.cursors=[null];records()};
+  $("recordLorry").onchange=()=>{S.page=0;S.cursors=[null];records()};
+  $("recordSort").onchange=()=>{S.page=0;S.cursors=[null];records()};
+  $("nextPage").onclick=()=>{S.page++;records()};$("prevPage").onclick=()=>{if(S.page>0)S.page--;records()};
+  $("recordsTable").onclick=e=>{
+    const selectAll=e.target.closest("#selectVisibleRecords");
+    if(selectAll){document.querySelectorAll("#recordsTable .record-select").forEach(x=>x.checked=selectAll.checked);updateBulkReview();return}
+    if(e.target.closest(".record-select")){updateBulkReview();return}
+    const row=e.target.closest("tr[data-record-id]");
+    if(!row)return;
+    const id=row.dataset.recordId;
+    const v=e.target.closest("[data-void]");if(v){voidEntry(id);return}
+    const cr=e.target.closest("[data-correct]");if(cr){openCorrection(id);return}
+    const b=e.target.closest("[data-status]");if(b)status(id,b.dataset.status)
   };
+  $("markSelectedChecked").onclick=markSelectedChecked;
   $("correctionForm").onsubmit=saveCorrection;
   $("correctionClose").onclick=()=>$("correctionDialog").close();
   $("correctionCancel").onclick=()=>$("correctionDialog").close();
