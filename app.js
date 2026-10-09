@@ -295,31 +295,6 @@ async function records(){
   q.push(f.orderBy("originalStart",$("recordSort").value));if(S.page>0&&S.cursors[S.page])q.push(f.startAfter(S.cursors[S.page]));q.push(f.limit(26));
   try{const snap=await f.getDocs(f.query(f.collection(f.db,"workEntries"),...q)),docs=snap.docs.filter(d=>d.data().status!=="void"),vis=docs.slice(0,25),rows=vis.map(d=>({id:d.id,...d.data()}));$("recordsTable").innerHTML=table(rows);$("recordCount").textContent=rows.length+" shown";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=docs.length<=25;if(docs.length>25&&vis.length)S.cursors[S.page+1]=vis[vis.length-1];updateBulkReview()}catch(e){$("recordsTable").innerHTML='<div style="padding:18px" class="muted">'+esc(e.message)+"</div>"}
 }
-async function review(){
-  let rows=[];
-  if(S.mode==="demo"){
-    rows=S.entries.filter(x=>x.status==="pending"||x.status==="correction").slice(0,50);
-  }else{
-    const f=S.fb;
-    try{
-      const snap=await f.getDocs(f.query(
-        f.collection(f.db,"workEntries"),
-        f.where("status","in",["pending","correction"]),
-        f.orderBy("originalStart","desc"),
-        f.limit(50)
-      ));
-      rows=snap.docs.map(d=>({id:d.id,...d.data()}));
-    }catch(e){$("reviewList").textContent=e.message;return}
-  }
-  $("reviewList").innerHTML=rows.length?rows.map(x=>{
-    const oa=new Date(x.originalStart),ob=new Date(x.originalEnd),a=new Date(x.correctedStart||x.originalStart),b=new Date(x.correctedEnd||x.originalEnd);
-    const correction=x.status==="correction",changed=!!x.correctedStart;
-    const originalLine=changed?'<div class="muted">Original: '+fmtT(oa)+' → '+fmtT(ob)+(x.overnight?" next day":"")+'</div>':"";
-    const reason=changed&&x.correctionReason?'<div class="muted">Reason: '+esc(x.correctionReason)+'</div>':"";
-    const pay=" · "+money(x.totals?.amount);
-    return '<article class="review-card" data-id="'+x.id+'"><strong>'+esc(ln(x.lorryId,x.lorryPlate))+'</strong><div class="muted">'+fmtD(a)+" · "+fmtT(a)+" → "+fmtT(b)+((x.correctedOvernight??x.overnight)?" next day":"")+" · "+Number(x.totals?.total||0).toFixed(2)+"h"+pay+'</div>'+originalLine+reason+'<div class="muted"><strong>Status:</strong> '+esc(correction?"Correction Required":"Pending Review")+'</div><div class="actions"><button class="secondary" data-status="checked">Mark Checked</button><button class="secondary" data-correct="1">'+(changed?"Edit Correction":"Correct Entry")+'</button>'+(!correction?'<button class="secondary" data-status="correction">Correction Required</button>':'')+(S.role==="manager"?'<button class="secondary" data-void="1">Void Entry</button>':'')+'</div></article>'
-  }).join(""):"<p class='muted'>No pending or correction entries.</p>";
-}
 async function status(id,v){
   if(S.mode==="demo"){const x=S.entries.find(e=>e.id===id);if(x)x.status=v}else{const f=S.fb;await f.updateDoc(f.doc(f.db,"workEntries",id),{status:v,reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()})}await records();
 }
@@ -395,7 +370,7 @@ async function saveCorrection(e){
     await f.updateDoc(f.doc(f.db,"workEntries",id),{...patch,correctedBy:S.user.uid,correctedAt:f.serverTimestamp(),reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()});
   }
   $("correctionDialog").close();
-  await review();await records();await report();
+  await records();await report();
 }
 function aggByLorry(rows){
   const m=new Map;
