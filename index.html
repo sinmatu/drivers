@@ -39,14 +39,11 @@
 
       <section id="shell" class="hidden">
         <div class="session-bar panel">
-          <label>
-            Active lorry
-            <select id="activeLorry"></select>
-          </label>
-          <div class="session-meta">
+          <div class="session-user">
+            <strong id="signedInName"></strong>
             <span id="roleBadge" class="badge"></span>
-            <button id="signOutBtn" class="link-btn">Sign out</button>
           </div>
+          <button id="signOutBtn" class="secondary" type="button">Sign out</button>
         </div>
 
         <nav id="tabs" class="tabs">
@@ -57,6 +54,13 @@
         </nav>
 
         <section id="view-entry" class="view panel">
+          <div class="entry-unit-bar">
+            <label>
+              Active lorry
+              <select id="activeLorry"></select>
+            </label>
+          </div>
+
           <div class="section-head">
             <div>
               <h2>New Work Entry</h2>
@@ -226,6 +230,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=20261009-02"></script>
+  <script type="module" src="./app.js?v=20261009-03"></script>
 </body>
 </html>
