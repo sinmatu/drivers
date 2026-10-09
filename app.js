@@ -109,7 +109,9 @@ async function masters(){
 function showLogin(){$("loginView").classList.remove("hidden");$("shell").classList.add("hidden")}
 function showShell(){
   $("loginView").classList.add("hidden");$("shell").classList.remove("hidden");
-  $("userArea").innerHTML="<strong>"+esc(S.user.displayName||S.user.email||"User")+"</strong>";
+  const signedName=S.user.displayName||S.user.email||"User";
+  $("userArea").innerHTML="<strong>"+esc(signedName)+"</strong>";
+  $("signedInName").textContent=signedName;
   $("roleBadge").textContent=S.role.charAt(0).toUpperCase()+S.role.slice(1);
   document.querySelectorAll("[data-role]").forEach(x=>x.classList.toggle("hidden",!x.dataset.role.split(",").includes(S.role)));
   selectors();settingsUI();resetEntryRows();records();report()
