@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+  <div id="appNotice" class="app-notice hidden" role="status"></div>
+  <div id="confirmLayer" class="app-confirm-layer hidden"><form id="confirmForm" class="app-confirm-card"><h3>Confirm action</h3><p id="confirmText"></p><div class="app-confirm-actions"><button id="confirmCancel" type="button" class="secondary">Cancel</button><button type="submit" class="primary">Confirm</button></div></form></div>
   <div id="app">
     <header class="topbar">
       <div>
@@ -230,6 +232,6 @@
     </form>
   </dialog>
 
-  <script type="module" src="./app.js?v=20261009-03"></script>
+  <script type="module" src="./app.js?v=20261012-embedded-01"></script>
 </body>
 </html>
