@@ -3,6 +3,24 @@ import { firebaseConfig } from "./firebase-config.js";
 
 const DEF={normalStart:"08:00",normalEnd:"17:00",saturdayEnd:"12:00",lunchStart:"12:00",lunchEnd:"13:00",nightStart:"00:00",nightEnd:"06:00",normalRate:10,otRate:15,nightRate:18};
 const S={mode:"demo",user:null,role:"staff",settings:{...DEF},lorries:[],holidays:[],entries:[],activeLorryId:"",page:0,cursors:[null],recordMode:"all",reportRows:[],reportSummaryRows:[],fb:null};
+
+// In-page notices and confirmations work in Google Sites embedded frames.
+function appNotice(message){
+ const el=$("appNotice");el.textContent=String(message);
+ el.classList.remove("hidden");
+ clearTimeout(appNotice.timeout);
+ appNotice.timeout=setTimeout(()=>el.classList.add("hidden"),5500);
+}
+function appConfirm(message){
+ return new Promise(resolve=>{
+  const layer=$("confirmLayer"),form=$("confirmForm"),cancel=$("confirmCancel");
+  $("confirmText").textContent=message;layer.classList.remove("hidden");
+  const finish=value=>{layer.classList.add("hidden");form.onsubmit=null;cancel.onclick=null;resolve(value)};
+  form.onsubmit=e=>{e.preventDefault();finish(true)};
+  cancel.onclick=()=>finish(false);
+ });
+}
+
 const $=id=>document.getElementById(id), pad=n=>String(n).padStart(2,"0"), money=n=>"RM "+Number(n||0).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
 const dk=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()), mk=d=>d.getFullYear()+"-"+pad(d.getMonth()+1);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
@@ -181,15 +199,15 @@ async function existingEntriesForDates(lorryId,dates){
 }
 async function submit(e){
   e.preventDefault();
-  if(!S.activeLorryId)return alert("Select the active lorry first.");
+  if(!S.activeLorryId)return appNotice("Select the active lorry first.");
   const button=e.submitter||e.target.querySelector('button[type="submit"]');
   if(button?.disabled)return;
   let rows;
-  try{rows=readEntryRows()}catch(err){return alert(err.message)}
+  try{rows=readEntryRows()}catch(err){return appNotice(err.message)}
   for(let i=0;i<rows.length;i++){
     for(let j=i+1;j<rows.length;j++){
       if(rows[i].start<rows[j].end&&rows[i].end>rows[j].start){
-        return alert("Entry rows "+rows[i].row+" and "+rows[j].row+" overlap. Adjust the times before submitting.");
+        return appNotice("Entry rows "+rows[i].row+" and "+rows[j].row+" overlap. Adjust the times before submitting.");
       }
     }
   }
@@ -202,7 +220,7 @@ async function submit(e){
         const a=new Date(x.correctedStart||x.originalStart),b=new Date(x.correctedEnd||x.originalEnd);
         return r.start<b&&r.end>a;
       });
-      if(clash)return alert("Row "+r.row+" overlaps an existing work entry for this lorry. Check Records before submitting.");
+      if(clash)return appNotice("Row "+r.row+" overlaps an existing work entry for this lorry. Check Records before submitting.");
     }
     const lorryPlate=S.lorries.find(x=>x.id===S.activeLorryId)?.plate||"";
     const counts={};
@@ -226,7 +244,7 @@ async function submit(e){
       }
     }
     resetEntryRows();
-    alert(rows.length+" entr"+(rows.length===1?"y":"ies")+" submitted.");
+    appNotice(rows.length+" entr"+(rows.length===1?"y":"ies")+" submitted.");
     await records();
   }finally{
     if(button)button.disabled=false;
@@ -302,7 +320,7 @@ async function status(id,v){
 }
 async function voidEntry(id){
   if(S.role!=="manager")return;
-  if(!confirm("Void this work entry? It will be excluded from normal records, reports, and overlap checks."))return;
+  if(!await appConfirm("Void this work entry? It will be excluded from normal records, reports, and overlap checks."))return;
   if(S.mode==="demo"){
     const x=S.entries.find(e=>e.id===id);if(x){x.status="void";x.voidedBy=S.user.uid;x.voidedAt=new Date().toISOString()}
   }else{
@@ -327,7 +345,7 @@ function correctionPreview(){
   }catch(e){$("correctionPreview").textContent=e.message}
 }
 async function openCorrection(id){
-  const x=await getEntry(id);if(!x)return alert("Work entry not found.");
+  const x=await getEntry(id);if(!x)return appNotice("Work entry not found.");
   const oa=new Date(x.originalStart),ob=new Date(x.originalEnd),a=new Date(x.correctedStart||x.originalStart),b=new Date(x.correctedEnd||x.originalEnd);
   $("correctionEntryId").value=x.id;
   $("correctionDialog").dataset.workDate=x.workDate||dk(oa);
@@ -343,10 +361,10 @@ async function openCorrection(id){
 }
 async function saveCorrection(e){
   e.preventDefault();
-  const id=$("correctionEntryId").value,x=await getEntry(id);if(!x)return alert("Work entry not found.");
+  const id=$("correctionEntryId").value,x=await getEntry(id);if(!x)return appNotice("Work entry not found.");
   const t=resolve(x.workDate||dk(new Date(x.originalStart)),$("correctionStart").value,$("correctionEnd").value);
   const publicHolidayEntitled=$("correctionPH").checked,c=calc(t.start,t.end,publicHolidayEntitled);
-  const reason=$("correctionReason").value.trim();if(!reason)return alert("Enter a correction reason.");
+  const reason=$("correctionReason").value.trim();if(!reason)return appNotice("Enter a correction reason.");
   const patch={
     originalLorryId:x.originalLorryId||x.lorryId,
     originalPublicHolidayEntitled:x.originalPublicHolidayEntitled??x.publicHolidayEntitled??false,
@@ -506,7 +524,7 @@ function reportExportMatrix(){
   return {month,aoa};
 }
 async function exportExcel(){
-  if(!S.reportSummaryRows.length)return alert("No report data to export.");
+  if(!S.reportSummaryRows.length)return appNotice("No report data to export.");
   const XLSX=await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs");
   const {month,aoa}=reportExportMatrix();
   const ws=XLSX.utils.aoa_to_sheet(aoa);
@@ -524,7 +542,7 @@ async function loadScript(src){
   });
 }
 async function exportPdf(){
-  if(!S.reportRows.length)return alert("No report data to export.");
+  if(!S.reportRows.length)return appNotice("No report data to export.");
   await loadScript("https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js");
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
@@ -560,7 +578,7 @@ async function exportPdf(){
   doc.save("lorry-report-"+(month||"all")+".pdf");
 }
 function settingsUI(){const s=S.settings;["normalStart","normalEnd","saturdayEnd","lunchStart","lunchEnd","nightStart","nightEnd","normalRate","otRate","nightRate"].forEach(k=>{if($(k))$(k).value=s[k]});$("lorryList").innerHTML=S.lorries.map(x=>'<span class="chip">'+esc(x.plate)+"</span>").join("");$("holidayList").innerHTML=S.holidays.sort((a,b)=>a.date.localeCompare(b.date)).map(x=>'<span class="chip">'+esc(x.date)+" · "+esc(x.name)+"</span>").join("")}
-async function saveSettings(e){e.preventDefault();const n={normalStart:$("normalStart").value,normalEnd:$("normalEnd").value,saturdayEnd:$("saturdayEnd").value,lunchStart:$("lunchStart").value,lunchEnd:$("lunchEnd").value,nightStart:$("nightStart").value,nightEnd:$("nightEnd").value,normalRate:Number($("normalRate").value),otRate:Number($("otRate").value),nightRate:Number($("nightRate").value)};S.settings=n;if(S.mode==="firebase"){const f=S.fb;await f.setDoc(f.doc(f.db,"settings","global"),n,{merge:true})}settingsUI();alert("Settings saved.")}
+async function saveSettings(e){e.preventDefault();const n={normalStart:$("normalStart").value,normalEnd:$("normalEnd").value,saturdayEnd:$("saturdayEnd").value,lunchStart:$("lunchStart").value,lunchEnd:$("lunchEnd").value,nightStart:$("nightStart").value,nightEnd:$("nightEnd").value,normalRate:Number($("normalRate").value),otRate:Number($("otRate").value),nightRate:Number($("nightRate").value)};S.settings=n;if(S.mode==="firebase"){const f=S.fb;await f.setDoc(f.doc(f.db,"settings","global"),n,{merge:true})}settingsUI();appNotice("Settings saved.")}
 async function addMaster(type,value){value=value.trim();if(!value)return;const data=type==="lorries"?{plate:value,active:true}:{name:value,active:true};if(S.mode==="firebase"){const f=S.fb,r=await f.addDoc(f.collection(f.db,type),data);S[type].push({id:r.id,...data})}else S[type].push({id:String(Date.now()),...data});selectors();settingsUI()}
 async function addHoliday(date,name){if(S.mode==="firebase"){const f=S.fb;await f.setDoc(f.doc(f.db,"holidays",date),{date,name})}const h=S.holidays.find(x=>x.date===date);if(h)h.name=name;else S.holidays.push({id:date,date,name});settingsUI()}
 function view(name){document.querySelectorAll(".view").forEach(x=>x.classList.add("hidden"));$("view-"+name).classList.remove("hidden");document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("active",x.dataset.view===name));if(name==="records")records();if(name==="reports")report()}
