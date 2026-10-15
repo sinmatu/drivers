@@ -2,7 +2,7 @@
 import { firebaseConfig } from "./firebase-config.js";
 
 const DEF={normalStart:"08:00",normalEnd:"17:00",saturdayEnd:"12:00",lunchStart:"12:00",lunchEnd:"13:00",nightStart:"00:00",nightEnd:"06:00",normalRate:10,otRate:15,nightRate:18};
-const S={mode:"demo",user:null,role:"staff",settings:{...DEF},lorries:[],holidays:[],entries:[],activeLorryId:"",page:0,cursors:[null],recordMode:"all",reportRows:[],reportSummaryRows:[],fb:null};
+const S={mode:"demo",user:null,role:"staff",settings:{...DEF},lorries:[],holidays:[],entries:[],activeLorryId:"",page:0,cursors:[null],recordMode:"all",reportRows:[],reportSummaryRows:[],fb:null,monthCache:new Map(),recordsRequest:0,reportRequest:0};
 
 // In-page notices and confirmations work in Google Sites embedded frames.
 function appNotice(message){
@@ -84,7 +84,7 @@ async function initFirebase(){
   const app=A.initializeApp(firebaseConfig),auth=U.getAuth(app),db=F.getFirestore(app);S.fb={...U,...F,auth,db};
   U.onAuthStateChanged(auth,async user=>{
     if(!user){showLogin();return}
-    S.mode="firebase";S.user=user;
+    S.mode="firebase";S.user=user;invalidateMonths();
     try{
       const ref=F.doc(db,"users",user.uid),snap=await F.getDoc(ref);
       if(!snap.exists())throw Error("Account is not authorised for this system.");
@@ -245,7 +245,7 @@ async function submit(e){
     }
     resetEntryRows();
     appNotice(rows.length+" entr"+(rows.length===1?"y":"ies")+" submitted.");
-    await records();
+    invalidateMonths();await records();
   }finally{
     if(button)button.disabled=false;
   }
@@ -299,24 +299,58 @@ async function markSelectedChecked(){
     ids.forEach(id=>batch.update(f.doc(f.db,"workEntries",id),{status:"checked",reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()}));
     await batch.commit();
   }
-  await records();
+  invalidateMonths();await records();
 }
 function range(month){const a=month.split("-").map(Number);return {start:new Date(a[0],a[1]-1,1),end:new Date(a[0],a[1],1)}}
+// One month is fetched once per session and shared by Records and Reports.
+// Concurrent requests for the same month reuse the same promise.
+function invalidateMonths(){
+  S.monthCache.clear();
+  S.recordsRequest++;
+  S.reportRequest++;
+}
+async function monthEntries(month){
+  if(S.mode==="demo")return month?S.entries.filter(x=>x.workDate?.startsWith(month)):S.entries;
+  const key=month||"__all__";
+  if(S.monthCache.has(key))return S.monthCache.get(key);
+  const f=S.fb;
+  const promise=(async()=>{
+    const filters=[];
+    if(month){
+      const r=range(month);
+      filters.push(f.where("originalStart",">=",r.start.toISOString()),f.where("originalStart","<",r.end.toISOString()));
+    }
+    filters.push(f.orderBy("originalStart","asc"));
+    const snap=await f.getDocs(f.query(f.collection(f.db,"workEntries"),...filters));
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  })();
+  S.monthCache.set(key,promise);
+  try{return await promise}catch(error){if(S.monthCache.get(key)===promise)S.monthCache.delete(key);throw error}
+}
 async function records(){
   if(!S.user)return;
-  if(S.mode==="demo"){
-    let a=S.entries.filter(x=>x.status!=="void"),m=$("recordMonth").value;if(m)a=a.filter(x=>x.workDate.startsWith(m));
-    if($("recordLorry").value)a=a.filter(x=>x.lorryId===$("recordLorry").value);
-    const dir=$("recordSort").value==="asc"?1:-1;a.sort((x,y)=>dir*(new Date(x.originalStart)-new Date(y.originalStart)));
-    const st=S.page*25,p=a.slice(st,st+25);$("recordsTable").innerHTML=table(p);$("recordCount").textContent=a.length+" records";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=st+25>=a.length;updateBulkReview();return;
+  const request=++S.recordsRequest,m=$("recordMonth").value;
+  try{
+    const source=await monthEntries(m);
+    if(request!==S.recordsRequest||m!==$("recordMonth").value)return;
+    const lorryId=$("recordLorry").value,dir=$("recordSort").value==="asc"?1:-1;
+    const all=source.filter(x=>x.status!=="void"&&(!lorryId||x.lorryId===lorryId))
+      .sort((a,b)=>dir*(new Date(a.originalStart)-new Date(b.originalStart)));
+    const pages=Math.max(1,Math.ceil(all.length/25));
+    S.page=Math.min(S.page,pages-1);
+    const st=S.page*25,rows=all.slice(st,st+25);
+    $("recordsTable").innerHTML=table(rows);
+    $("recordCount").textContent=all.length+" records";
+    $("pageLabel").textContent="Page "+(S.page+1)+" of "+pages;
+    $("prevPage").disabled=S.page===0;
+    $("nextPage").disabled=S.page>=pages-1;
+    updateBulkReview();
+  }catch(error){
+    if(request===S.recordsRequest)$("recordsTable").innerHTML='<div style="padding:18px" class="muted">'+esc(error.message)+"</div>";
   }
-  const f=S.fb,m=$("recordMonth").value,q=[];if(m){const r=range(m);q.push(f.where("originalStart",">=",r.start.toISOString()),f.where("originalStart","<",r.end.toISOString()))}
-  if($("recordLorry").value)q.push(f.where("lorryId","==",$("recordLorry").value));
-  q.push(f.orderBy("originalStart",$("recordSort").value));if(S.page>0&&S.cursors[S.page])q.push(f.startAfter(S.cursors[S.page]));q.push(f.limit(26));
-  try{const snap=await f.getDocs(f.query(f.collection(f.db,"workEntries"),...q)),docs=snap.docs.filter(d=>d.data().status!=="void"),vis=docs.slice(0,25),rows=vis.map(d=>({id:d.id,...d.data()}));$("recordsTable").innerHTML=table(rows);$("recordCount").textContent=rows.length+" shown";$("pageLabel").textContent="Page "+(S.page+1);$("prevPage").disabled=S.page===0;$("nextPage").disabled=docs.length<=25;if(docs.length>25&&vis.length)S.cursors[S.page+1]=vis[vis.length-1];updateBulkReview()}catch(e){$("recordsTable").innerHTML='<div style="padding:18px" class="muted">'+esc(e.message)+"</div>"}
 }
 async function status(id,v){
-  if(S.mode==="demo"){const x=S.entries.find(e=>e.id===id);if(x)x.status=v}else{const f=S.fb;await f.updateDoc(f.doc(f.db,"workEntries",id),{status:v,reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()})}await records();
+  if(S.mode==="demo"){const x=S.entries.find(e=>e.id===id);if(x)x.status=v}else{const f=S.fb;await f.updateDoc(f.doc(f.db,"workEntries",id),{status:v,reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()})}invalidateMonths();await records();
 }
 async function voidEntry(id){
   if(S.role!=="manager")return;
@@ -327,7 +361,7 @@ async function voidEntry(id){
     const f=S.fb;
     await f.updateDoc(f.doc(f.db,"workEntries",id),{status:"void",voidedBy:S.user.uid,voidedAt:f.serverTimestamp()});
   }
-  await records();await report();
+  invalidateMonths();invalidateMonths();await records();await report();
 }
 async function getEntry(id){
   if(S.mode==="demo")return S.entries.find(x=>x.id===id)||null;
@@ -390,7 +424,7 @@ async function saveCorrection(e){
     await f.updateDoc(f.doc(f.db,"workEntries",id),{...patch,correctedBy:S.user.uid,correctedAt:f.serverTimestamp(),reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()});
   }
   $("correctionDialog").close();
-  await records();await report();
+  invalidateMonths();invalidateMonths();await records();await report();
 }
 function aggByLorry(rows){
   const m=new Map;
@@ -409,25 +443,16 @@ function grandTotal(rows){
   return g;
 }
 async function loadReportRows(){
-  const m=$("reportMonth").value,lorryId=$("reportLorry").value;
-  let rows=[];
-  if(S.mode==="demo"){
-    rows=S.entries.filter(x=>x.status!=="void"&&(!m||x.workDate.startsWith(m))&&(!lorryId||x.lorryId===lorryId));
-  }else{
-    const f=S.fb,r=range(m);
-    const s=await f.getDocs(f.query(
-      f.collection(f.db,"workEntries"),
-      f.where("originalStart",">=",r.start.toISOString()),
-      f.where("originalStart","<",r.end.toISOString()),
-      f.orderBy("originalStart","asc")
-    ));
-    rows=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.status!=="void"&&(!lorryId||x.lorryId===lorryId));
-  }
-  return rows;
+  const month=$("reportMonth").value,lorryId=$("reportLorry").value;
+  const source=await monthEntries(month);
+  return source.filter(x=>x.status!=="void"&&(!lorryId||x.lorryId===lorryId));
 }
 async function report(){
+  const request=++S.reportRequest;
+  const selectedMonth=$("reportMonth").value,selectedLorry=$("reportLorry").value;
   try{
     const rows=await loadReportRows();
+    if(request!==S.reportRequest||selectedMonth!==$("reportMonth").value||selectedLorry!==$("reportLorry").value)return;
     S.reportRows=rows;
 
     const selected=$("reportLorry").value;
@@ -629,10 +654,10 @@ function wire(){
   $("addEntryRow").onclick=()=>addEntryRow({},true);
   $("entryRows").onclick=e=>{const b=e.target.closest(".remove-entry-row");if(b){b.closest(".entry-row").remove();refreshEntryRows()}};
   $("workForm").onsubmit=submit;
-  $("recordApply").onclick=()=>{S.page=0;S.cursors=[null];records()};
-  $("recordMonth").onchange=()=>{S.page=0;S.cursors=[null];records()};
-  $("recordLorry").onchange=()=>{S.page=0;S.cursors=[null];records()};
-  $("recordSort").onchange=()=>{S.page=0;S.cursors=[null];records()};
+  $("recordApply").onclick=()=>{S.page=0;records()};
+  $("recordMonth").onchange=()=>{S.page=0;records()};
+  $("recordLorry").onchange=()=>{S.page=0;records()};
+  $("recordSort").onchange=()=>{S.page=0;records()};
   $("nextPage").onclick=()=>{S.page++;records()};$("prevPage").onclick=()=>{if(S.page>0)S.page--;records()};
   $("recordsTable").onclick=e=>{
     const selectAll=e.target.closest("#selectVisibleRecords");
