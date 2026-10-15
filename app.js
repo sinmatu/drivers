@@ -2,7 +2,7 @@
 import { firebaseConfig } from "./firebase-config.js";
 
 const DEF={normalStart:"08:00",normalEnd:"17:00",saturdayEnd:"12:00",lunchStart:"12:00",lunchEnd:"13:00",nightStart:"00:00",nightEnd:"06:00",normalRate:10,otRate:15,nightRate:18};
-const S={mode:"demo",user:null,role:"staff",settings:{...DEF},lorries:[],holidays:[],entries:[],activeLorryId:"",page:0,cursors:[null],recordMode:"all",reportRows:[],reportSummaryRows:[],fb:null,monthCache:new Map(),recordsRequest:0,reportRequest:0};
+const S={mode:"demo",user:null,role:"staff",settings:{...DEF},lorries:[],holidays:[],entries:[],activeLorryId:"",page:0,cursors:[null],recordMode:"all",reportRows:[],reportSummaryRows:[],fb:null,monthCache:new Map(),monthListeners:new Map(),recordsRequest:0,reportRequest:0};
 
 // In-page notices and confirmations work in Google Sites embedded frames.
 function appNotice(message){
@@ -83,7 +83,7 @@ async function initFirebase(){
   ]);
   const app=A.initializeApp(firebaseConfig),auth=U.getAuth(app),db=F.getFirestore(app);S.fb={...U,...F,auth,db};
   U.onAuthStateChanged(auth,async user=>{
-    if(!user){showLogin();return}
+    if(!user){clearMonthListeners();S.monthCache.clear();S.user=null;showLogin();return}
     S.mode="firebase";S.user=user;invalidateMonths();
     try{
       const ref=F.doc(db,"users",user.uid),snap=await F.getDoc(ref);
@@ -304,7 +304,14 @@ async function markSelectedChecked(){
 function range(month){const a=month.split("-").map(Number);return {start:new Date(a[0],a[1]-1,1),end:new Date(a[0],a[1],1)}}
 // One month is fetched once per session and shared by Records and Reports.
 // Concurrent requests for the same month reuse the same promise.
+function clearMonthListeners(){
+  for(const unsubscribe of S.monthListeners.values())unsubscribe();
+  S.monthListeners.clear();
+}
 function invalidateMonths(){
+  // Local writes must discard existing results; Firestore listeners will also
+  // deliver changes made by other authenticated users.
+  clearMonthListeners();
   S.monthCache.clear();
   S.recordsRequest++;
   S.reportRequest++;
@@ -312,20 +319,46 @@ function invalidateMonths(){
 async function monthEntries(month){
   if(S.mode==="demo")return month?S.entries.filter(x=>x.workDate?.startsWith(month)):S.entries;
   const key=month||"__all__";
-  if(S.monthCache.has(key))return S.monthCache.get(key);
+  if(S.monthCache.has(key))return S.monthCache.get(key).promise;
   const f=S.fb;
-  const promise=(async()=>{
-    const filters=[];
-    if(month){
-      const r=range(month);
-      filters.push(f.where("originalStart",">=",r.start.toISOString()),f.where("originalStart","<",r.end.toISOString()));
+  const filters=[];
+  if(month){
+    const r=range(month);
+    filters.push(f.where("originalStart",">=",r.start.toISOString()),f.where("originalStart","<",r.end.toISOString()));
+  }
+  filters.push(f.orderBy("originalStart","asc"));
+  const query=f.query(f.collection(f.db,"workEntries"),...filters);
+  let resolveFirst,rejectFirst;
+  const promise=new Promise((resolve,reject)=>{resolveFirst=resolve;rejectFirst=reject});
+  const entry={promise,rows:[],ready:false};
+  S.monthCache.set(key,entry);
+  const unsubscribe=f.onSnapshot(query,snap=>{
+    if(S.monthCache.get(key)!==entry)return;
+    entry.rows=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!entry.ready){entry.ready=true;resolveFirst(entry.rows);return}
+    entry.promise=Promise.resolve(entry.rows);
+    if($("recordMonth").value===month)records();
+    if($("reportMonth").value===month)report();
+  },error=>{
+    if(S.monthCache.get(key)!==entry)return;
+    S.monthCache.delete(key);
+    S.monthListeners.delete(key);
+    if(!entry.ready)rejectFirst(error);
+    else appNotice("Live data connection interrupted: "+error.message);
+  });
+  S.monthListeners.set(key,unsubscribe);
+  // Avoid unlimited live listeners when browsing many historic months.
+  if(S.monthListeners.size>3){
+    for(const oldKey of S.monthListeners.keys()){
+      if(oldKey!==key&&oldKey!==($("recordMonth").value||"__all__")&&oldKey!==($("reportMonth").value||"__all__")){
+        S.monthListeners.get(oldKey)();
+        S.monthListeners.delete(oldKey);
+        S.monthCache.delete(oldKey);
+        break;
+      }
     }
-    filters.push(f.orderBy("originalStart","asc"));
-    const snap=await f.getDocs(f.query(f.collection(f.db,"workEntries"),...filters));
-    return snap.docs.map(d=>({id:d.id,...d.data()}));
-  })();
-  S.monthCache.set(key,promise);
-  try{return await promise}catch(error){if(S.monthCache.get(key)===promise)S.monthCache.delete(key);throw error}
+  }
+  return promise;
 }
 async function records(){
   if(!S.user)return;
