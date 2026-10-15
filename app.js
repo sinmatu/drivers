@@ -361,7 +361,7 @@ async function voidEntry(id){
     const f=S.fb;
     await f.updateDoc(f.doc(f.db,"workEntries",id),{status:"void",voidedBy:S.user.uid,voidedAt:f.serverTimestamp()});
   }
-  invalidateMonths();invalidateMonths();await records();await report();
+  invalidateMonths();await records();await report();
 }
 async function getEntry(id){
   if(S.mode==="demo")return S.entries.find(x=>x.id===id)||null;
@@ -424,7 +424,7 @@ async function saveCorrection(e){
     await f.updateDoc(f.doc(f.db,"workEntries",id),{...patch,correctedBy:S.user.uid,correctedAt:f.serverTimestamp(),reviewedBy:S.user.uid,reviewedAt:f.serverTimestamp()});
   }
   $("correctionDialog").close();
-  invalidateMonths();invalidateMonths();await records();await report();
+  invalidateMonths();await records();await report();
 }
 function aggByLorry(rows){
   const m=new Map;
