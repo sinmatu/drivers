@@ -605,18 +605,14 @@ async function exportPdf(){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
   const {month,aoa}=reportExportMatrix();
-  let y=14;
-  doc.setFontSize(14);
-  doc.text("Lorry System Report",14,y);y+=7;
-  doc.setFontSize(9);
-  doc.text("Month: "+(month||"All"),14,y);y+=8;
+  const navy=[35,56,91],pale=[230,238,248],stripe=[246,249,253];let y=30,n=0;function page(){doc.setFillColor(...navy);doc.rect(0,0,297,22,"F");doc.setTextColor(255,255,255);doc.setFont(undefined,"bold");doc.setFontSize(14);doc.text("Lorry System Report",14,12);doc.setFont(undefined,"normal");doc.setFontSize(9);doc.text("Month: "+(month||"All"),282,12,{align:"right"});doc.setTextColor(30,44,63);y=30}page();
+  doc.setFontSize(8);
   const colX=[14,48,78,102,128,154,183,216,246];
   for(const row of aoa.slice(3)){
-    if(y>190){doc.addPage();y=16}
+    if(y>190){doc.addPage();page()}
     const isSection=row.length===1&&row[0];
     if(isSection){
-      doc.setFont(undefined,"bold");
-      doc.text(String(row[0]),14,y);
+      doc.setFillColor(...pale);doc.rect(12,y-4,272,9,"F");doc.setTextColor(...navy);doc.setFont(undefined,"bold");doc.text(String(row[0]),15,y+1);doc.setTextColor(30,44,63);
       doc.setFont(undefined,"normal");
       y+=7;continue;
     }
@@ -624,16 +620,16 @@ async function exportPdf(){
     const first=String(row[0]??"");
     const header=first==="Date";
     const total=first==="Total"||first==="Subtotal"||first==="Grand Total";
-    if(header||total)doc.setFont(undefined,"bold");
+    if(header||total){doc.setFillColor(...(header?navy:pale));doc.rect(12,y-4,272,7,"F")}else if(n++%2===0){doc.setFillColor(...stripe);doc.rect(12,y-4,272,7,"F")}doc.setTextColor(...(header?[255,255,255]:[30,44,63]));if(header||total)doc.setFont(undefined,"bold");
     row.forEach((v,i)=>{
       if(v===undefined||v===null||v==="")return;
       const txt=typeof v==="number"?Number(v).toFixed(2):String(v);
       doc.text(txt,colX[i]||14,y);
     });
-    if(header||total)doc.setFont(undefined,"normal");
+    if(header||total)doc.setFont(undefined,"normal");doc.setTextColor(30,44,63);
     y+=6;
   }
-  doc.save("lorry-report-"+(month||"all")+".pdf");
+  const pages=doc.internal.getNumberOfPages();for(let p=1;p<=pages;p++){doc.setPage(p);doc.setFontSize(8);doc.setTextColor(100,110,125);doc.line(12,199,284,199);doc.text("Page "+p+" / "+pages,283,204,{align:"right"})}doc.save("lorry-report-"+(month||"all")+".pdf");
 }
 function settingsUI(){const s=S.settings;["normalStart","normalEnd","saturdayEnd","lunchStart","lunchEnd","nightStart","nightEnd","normalRate","otRate","nightRate"].forEach(k=>{if($(k))$(k).value=s[k]});$("lorryList").innerHTML=S.lorries.map(x=>'<span class="chip">'+esc(x.plate)+"</span>").join("");$("holidayList").innerHTML=S.holidays.sort((a,b)=>a.date.localeCompare(b.date)).map(x=>'<span class="chip">'+esc(x.date)+" · "+esc(x.name)+"</span>").join("")}
 async function saveSettings(e){e.preventDefault();const n={normalStart:$("normalStart").value,normalEnd:$("normalEnd").value,saturdayEnd:$("saturdayEnd").value,lunchStart:$("lunchStart").value,lunchEnd:$("lunchEnd").value,nightStart:$("nightStart").value,nightEnd:$("nightEnd").value,normalRate:Number($("normalRate").value),otRate:Number($("otRate").value),nightRate:Number($("nightRate").value)};S.settings=n;if(S.mode==="firebase"){const f=S.fb;await f.setDoc(f.doc(f.db,"settings","global"),n,{merge:true})}settingsUI();appNotice("Settings saved.")}
